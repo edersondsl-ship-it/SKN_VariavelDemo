@@ -328,14 +328,12 @@
 
     /* ── DOSADORES ── */
     fetch('/api/dosadores').then(r=>r.json()).then(lista => {
-      document.getElementById('dosadores-grid').innerHTML = lista.length
-        ? lista.map(d => `
-            <div class="dosador-card" onclick="abrirDosador(${d.id},'${d.nome}')">
-              <div class="dc-nome">${d.nome}</div>
-              ${d.descricao ? `<div class="dc-desc">${d.descricao}</div>` : ''}
-              <div class="dc-btn">Ver variáveis ›</div>
-            </div>`).join('')
-        : '<span style="color:rgba(255,255,255,.3);font-size:.8rem;letter-spacing:2px">Nenhum dosador cadastrado</span>';
+      if (lista.length) {
+        abrirDosador(lista[0].id, lista[0].nome);
+      } else {
+        document.getElementById('dosadores-grid').innerHTML =
+          '<span style="color:rgba(255,255,255,.3);font-size:.8rem;letter-spacing:2px">Nenhum dosador cadastrado</span>';
+      }
     }).catch(() => {});
 
     /* ── TROCA DE VIEW ── */

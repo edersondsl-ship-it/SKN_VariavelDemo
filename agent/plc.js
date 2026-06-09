@@ -10,7 +10,7 @@ class PLCClient {
 
   conectar() {
     return new Promise((resolve, reject) => {
-      const opts = { host: cfg.plc.ip, rack: cfg.plc.rack, slot: cfg.plc.slot };
+      const opts = { host: cfg.plc.ip, port: 102, rack: cfg.plc.rack, slot: cfg.plc.slot, timeout: 5000 };
       this.conn.initiateConnection(opts, (err) => {
         if (err) {
           this.conectado = false;

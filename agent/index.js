@@ -1,37 +1,46 @@
-const axios = require('axios');
-const S7Client = require('./s7client');
-const config = require('./config');
+const axios   = require('axios');
+const PLCClient = require('./plc');
+const cfg     = require('./config');
 
-const plc = new S7Client();
+const plc = new PLCClient();
 
-async function enviarDados(variaveis) {
-  await axios.post(`${config.serverUrl}/api/variaveis`, {
-    dosador_id: config.dosadorId,
-    variaveis
+function log(msg) {
+  const ts = new Date().toLocaleString('pt-BR');
+  console.log(`[${ts}] ${msg}`);
+}
+
+async function enviar(variaveis) {
+  await axios.post(`${cfg.serverUrl}/api/variaveis`, {
+    dosador_id: cfg.dosadorId,
+    variaveis,
   }, {
-    headers: { 'x-agent-token': config.agentToken },
-    timeout: 5000
+    headers: { 'x-agent-token': cfg.agentToken },
+    timeout: 8000,
   });
 }
 
 async function ciclo() {
   try {
-    const variaveis = await plc.lerVariaveis();
-    await enviarDados(variaveis);
-    console.log(`[${new Date().toISOString()}] ${variaveis.length} variáveis enviadas`);
-  } catch (err) {
-    console.error(`[${new Date().toISOString()}] ERRO: ${err.message}`);
-    // Tenta reconectar no próximo ciclo
-    if (plc.connected) {
-      plc.disconnect();
+    if (!plc.conectado) {
+      log('Conectando ao PLC...');
+      await plc.conectar();
+      log(`Conectado em ${cfg.plc.ip}`);
     }
+
+    const vars = await plc.ler();
+    await enviar(vars);
+    log(`OK — ${vars.length} variáveis enviadas`);
+
+  } catch (err) {
+    log(`ERRO: ${err.message}`);
+    plc.desconectar();
   }
 }
 
-console.log(`Agente SKN Demo iniciado`);
-console.log(`PLC: ${config.plc.ip}  |  Dosador ID: ${config.dosadorId}`);
-console.log(`Servidor: ${config.serverUrl}`);
-console.log(`Intervalo: ${config.intervaloMs}ms\n`);
+log('=== SKN Agente iniciado ===');
+log(`PLC: ${cfg.plc.ip} | Dosador: ${cfg.dosadorId} | Intervalo: ${cfg.intervaloMs}ms`);
+log(`Servidor: ${cfg.serverUrl}`);
+log('');
 
 ciclo();
-setInterval(ciclo, config.intervaloMs);
+setInterval(ciclo, cfg.intervaloMs);

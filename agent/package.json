@@ -1,18 +1,14 @@
 {
-  "name": "skn-demo-agent",
+  "name": "skn-agente",
   "version": "1.0.0",
-  "description": "Agente local - lê CPU1200 e envia para nuvem",
+  "description": "Agente local - lê CPU1200 via nodes7 e envia para nuvem",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js"
+    "start": "node index.js"
   },
   "dependencies": {
     "axios": "^1.7.9",
     "dotenv": "^16.4.7",
-    "node-snap7": "^1.1.0"
-  },
-  "devDependencies": {
-    "nodemon": "^3.1.9"
+    "nodes7": "^2.1.1"
   }
 }

@@ -23,7 +23,7 @@
         radial-gradient(ellipse 70% 70% at 50% 50%, rgba(18,45,43,.08) 0%, rgba(10,28,27,.78) 100%),
         rgba(15,35,33,.5);
     }
-    .grid {
+    .grid-bg {
       position:fixed; inset:0; z-index:2; pointer-events:none;
       background-image: linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px), linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px);
       background-size:52px 52px;
@@ -58,7 +58,7 @@
     #hud-date  { position:fixed; top:118px; right:32px; z-index:20; text-align:right; animation:fadeUp .4s ease 1.3s both; }
     .hud-date-line1 { font-size:2rem; font-weight:800; color:rgba(255,255,255,.85); letter-spacing:4px; text-shadow:0 0 22px rgba(45,212,191,.4); }
     .hud-date-line2 { font-size:.85rem; font-weight:800; color:rgba(45,212,191,.6); letter-spacing:4px; text-transform:uppercase; margin-top:6px; }
-    #conn-status    { font-size:.62rem; font-weight:700; letter-spacing:2px; text-align:right; margin-top:6px; color:rgba(100,116,139,.6); display:none; }
+    #conn-status    { font-size:.62rem; font-weight:700; letter-spacing:2px; text-align:right; margin-top:6px; color:rgba(100,116,139,.6); }
 
     /* ── BRAND BADGE ── */
     #brand-badge {
@@ -67,7 +67,6 @@
       background-image:linear-gradient(130deg, rgba(45,212,191,.06) 0%, rgba(45,212,191,.7) 22%, rgba(45,212,191,.06) 50%, rgba(45,212,191,.6) 78%, rgba(45,212,191,.06) 100%);
       background-size:300% 300%;
       animation:badgeFadeIn .5s ease 1.0s both, auroraShift 5s ease-in-out 1.5s infinite;
-      transition:opacity .3s;
     }
     .badge-inner { display:flex; align-items:center; gap:14px; background:rgba(14,32,31,.82); border-radius:16.5px; padding:14px 28px; backdrop-filter:blur(22px); box-shadow:inset 0 1px 0 rgba(255,255,255,.08); }
     .badge-icon  { width:28px; height:28px; filter:brightness(20) opacity(.85); }
@@ -78,57 +77,20 @@
     @keyframes badgeFadeIn { from{opacity:0} to{opacity:1} }
     @keyframes auroraShift { 0%,100%{background-position:0% 50%} 50%{background-position:100% 50%} }
 
-    /* ── BOTÃO VOLTAR ── */
-    #btn-voltar {
-      position:fixed; top:26px; left:26px; z-index:30;
-      display:none; align-items:center; gap:8px;
-      background:rgba(14,32,31,.82); border:1px solid rgba(45,212,191,.2);
-      border-radius:12px; padding:10px 20px;
-      color:rgba(45,212,191,.85); font-family:'Poppins',sans-serif;
-      font-size:.75rem; font-weight:700; letter-spacing:2px; text-transform:uppercase;
-      cursor:pointer; backdrop-filter:blur(18px);
-      transition:border-color .2s, box-shadow .2s;
-    }
-    #btn-voltar:hover { border-color:rgba(45,212,191,.5); box-shadow:0 0 18px rgba(45,212,191,.1); }
-
-    /* ── NOME DOSADOR ── */
-    #nome-dosador {
-      position:fixed; top:32px; left:50%; transform:translateX(-50%);
-      z-index:20; font-size:.72rem; font-weight:800; letter-spacing:4px;
-      text-transform:uppercase; color:rgba(255,255,255,.5);
-      display:none;
+    /* ── VARIÁVEIS ── */
+    #cards-wrap {
+      position:fixed; inset:0; z-index:10;
+      display:flex; align-items:center; justify-content:center;
+      padding:0 32px;
     }
 
-    /* ── VIEWS ── */
-    .view { position:fixed; inset:0; z-index:10; transition:opacity .4s ease; }
-    .view.oculto { opacity:0; pointer-events:none; }
-
-    /* ── VIEW LISTA ── */
-    #view-lista { display:flex; align-items:center; justify-content:center; }
-    .central-label { font-size:.65rem; font-weight:700; letter-spacing:.18em; text-transform:uppercase; color:rgba(45,212,191,.6); margin-bottom:28px; text-align:center; }
-    #dosadores-grid { display:flex; gap:16px; flex-wrap:wrap; justify-content:center; }
-
-    .dosador-card {
-      background:rgba(14,32,31,.78); border:1px solid rgba(45,212,191,.18);
-      border-radius:18px; padding:28px 36px;
-      min-width:220px; display:flex; flex-direction:column; align-items:center; gap:10px;
-      backdrop-filter:blur(22px); cursor:pointer;
-      transition:border-color .25s, box-shadow .25s, transform .2s;
-      position:relative; overflow:hidden;
+    .vars-grid {
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:14px;
+      width:100%;
+      max-width:980px;
     }
-    .dosador-card::before { content:''; position:absolute; top:0; left:20px; right:20px; height:2px; background:linear-gradient(90deg,transparent,rgba(45,212,191,.7),transparent); }
-    .dosador-card:hover { border-color:rgba(45,212,191,.5); box-shadow:0 0 36px rgba(45,212,191,.15); transform:translateY(-3px); }
-    .dc-nome { font-size:1rem; font-weight:800; letter-spacing:3px; text-transform:uppercase; color:#fff; text-shadow:0 0 16px rgba(45,212,191,.3); }
-    .dc-desc { font-size:.65rem; font-weight:500; letter-spacing:1.5px; color:rgba(255,255,255,.4); text-align:center; }
-    .dc-btn  { margin-top:8px; font-size:.65rem; font-weight:800; letter-spacing:3px; text-transform:uppercase; color:var(--accent); border:1px solid rgba(45,212,191,.3); border-radius:8px; padding:6px 18px; transition:background .2s; }
-    .dosador-card:hover .dc-btn { background:rgba(45,212,191,.12); }
-
-    /* ── VIEW VARIÁVEIS ── */
-    #view-vars { display:flex; align-items:center; justify-content:center; }
-
-    #cards-wrap { padding:0 32px; width:100%; }
-    .vars-row { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; max-width:980px; margin:0 auto; }
-    .vars-row + .vars-row { margin-top:14px; }
 
     .card {
       background:rgba(14,32,31,.72); border:1px solid rgba(45,212,191,.15);
@@ -161,13 +123,13 @@
     @keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
 
     @media (max-width:760px) {
-      .vars-row { grid-template-columns:repeat(2,1fr); }
+      .vars-grid { grid-template-columns:repeat(2,1fr); }
       #hud-clock { font-size:3.8rem; letter-spacing:5px; }
       #hud-date  { top:88px; }
       .hud-date-line1 { font-size:1.4rem; }
     }
     @media (max-width:480px) {
-      .vars-row { grid-template-columns:1fr; }
+      .vars-grid { grid-template-columns:1fr; }
       #cards-wrap { padding:0 16px; }
     }
   </style>
@@ -177,7 +139,7 @@
   <div class="bg-layer" id="bgA"></div>
   <div class="bg-layer" id="bgB"></div>
   <div class="overlay"></div>
-  <div class="grid"></div>
+  <div class="grid-bg"></div>
   <div class="grain"></div>
   <img src="img/Logo.png" class="bg-wm" alt="">
 
@@ -204,47 +166,32 @@
     </div>
   </div>
 
-  <button id="btn-voltar">&#8592; Voltar</button>
-  <div id="nome-dosador"></div>
-
-  <!-- VIEW 1: lista de dosadores -->
-  <div class="view" id="view-lista">
-    <div>
-      <div class="central-label">Selecione o dosador</div>
-      <div id="dosadores-grid"></div>
-    </div>
-  </div>
-
-  <!-- VIEW 2: variáveis -->
-  <div class="view oculto" id="view-vars">
-    <div id="cards-wrap">
-      <div class="vars-row">
-        <div class="card">
-          <div class="card-label">Pressão</div>
-          <div><span class="card-value" id="val-pressao">--</span><span class="card-unit">bar</span></div>
-        </div>
-        <div class="card">
-          <div class="card-label">Temperatura</div>
-          <div><span class="card-value" id="val-temperatura">--</span><span class="card-unit">°C</span></div>
-        </div>
-        <div class="card">
-          <div class="card-label">Vazão</div>
-          <div><span class="card-value" id="val-vazao">--</span><span class="card-unit">l/min</span></div>
-        </div>
+  <!-- CARDS DE VARIÁVEIS -->
+  <div id="cards-wrap">
+    <div class="vars-grid">
+      <div class="card">
+        <div class="card-label">Pressão</div>
+        <div><span class="card-value" id="val-pressao">--</span><span class="card-unit">bar</span></div>
       </div>
-      <div class="vars-row">
-        <div class="card">
-          <div class="card-label">pH Medido</div>
-          <div><span class="card-value" id="val-ph">--</span><span class="card-unit">pH</span></div>
-        </div>
-        <div class="card setpoint">
-          <div class="card-label">Setpoint pH</div>
-          <div><span class="card-value" id="val-setpoint">--</span><span class="card-unit">pH</span></div>
-        </div>
-        <div class="card">
-          <div class="card-label">% Controle</div>
-          <div><span class="card-value" id="val-ctrl">--</span><span class="card-unit">%</span></div>
-        </div>
+      <div class="card">
+        <div class="card-label">Temperatura</div>
+        <div><span class="card-value" id="val-temperatura">--</span><span class="card-unit">°C</span></div>
+      </div>
+      <div class="card">
+        <div class="card-label">Vazão</div>
+        <div><span class="card-value" id="val-vazao">--</span><span class="card-unit">l/min</span></div>
+      </div>
+      <div class="card">
+        <div class="card-label">pH Medido</div>
+        <div><span class="card-value" id="val-ph">--</span><span class="card-unit">pH</span></div>
+      </div>
+      <div class="card setpoint">
+        <div class="card-label">Setpoint pH</div>
+        <div><span class="card-value" id="val-setpoint">--</span><span class="card-unit">pH</span></div>
+      </div>
+      <div class="card">
+        <div class="card-label">% Controle</div>
+        <div><span class="card-value" id="val-ctrl">--</span><span class="card-unit">%</span></div>
       </div>
     </div>
   </div>
@@ -270,7 +217,7 @@
     }
     tick(); setInterval(tick, 1000);
 
-    /* ── FOTOS (apenas na view lista) ── */
+    /* ── KEN BURNS FOTOS ── */
     const KBS = ['kb1','kb2','kb3','kb4','kb5'];
     const PHOTO_INTERVAL = 8000, STAGE_LEAD = 3500;
     let photoCurrent = 0, useA = true, stagedIdx = 1, crossTimer = null, stageTimer = null;
@@ -302,16 +249,10 @@
       applyKB(bgA, p.kb);
       if (validPhotos.length > 1) {
         stagedIdx = (photoCurrent+1) % validPhotos.length;
-        const next = bgB;
-        next.style.backgroundImage = `url('${validPhotos[stagedIdx].src}')`;
-        next.style.opacity='0'; next.style.animation='none';
+        bgB.style.backgroundImage = `url('${validPhotos[stagedIdx].src}')`;
+        bgB.style.opacity='0'; bgB.style.animation='none';
         crossTimer = setTimeout(crossfade, PHOTO_INTERVAL);
       }
-    }
-
-    function fotosPause() {
-      clearTimeout(crossTimer); clearTimeout(stageTimer);
-      bgA.style.opacity='0'; bgB.style.opacity='0';
     }
 
     fetch('/api/foto-marketing').then(r=>r.json()).then(files => {
@@ -326,53 +267,8 @@
       });
     }).catch(() => {});
 
-    /* ── DOSADORES ── */
-    fetch('/api/dosadores').then(r=>r.json()).then(lista => {
-      if (lista.length) {
-        abrirDosador(lista[0].id, lista[0].nome);
-      } else {
-        document.getElementById('dosadores-grid').innerHTML =
-          '<span style="color:rgba(255,255,255,.3);font-size:.8rem;letter-spacing:2px">Nenhum dosador cadastrado</span>';
-      }
-    }).catch(() => {});
-
-    /* ── TROCA DE VIEW ── */
-    let dosadorAtivo = null, pollTimer = null;
-
-    function abrirDosador(id, nome) {
-      dosadorAtivo = id;
-      fotosPause();
-      document.getElementById('brand-badge').style.opacity = '0';
-      document.getElementById('brand-badge').style.pointerEvents = 'none';
-      document.getElementById('btn-voltar').style.display = 'flex';
-      document.getElementById('nome-dosador').textContent = nome;
-      document.getElementById('nome-dosador').style.display = 'block';
-      document.getElementById('conn-status').style.display = 'block';
-      document.getElementById('view-lista').classList.add('oculto');
-      document.getElementById('view-vars').classList.remove('oculto');
-      buscarVariaveis();
-      pollTimer = setInterval(buscarVariaveis, 10000);
-    }
-
-    document.getElementById('btn-voltar').addEventListener('click', () => {
-      clearInterval(pollTimer);
-      dosadorAtivo = null;
-      document.getElementById('view-vars').classList.add('oculto');
-      document.getElementById('view-lista').classList.remove('oculto');
-      document.getElementById('btn-voltar').style.display = 'none';
-      document.getElementById('nome-dosador').style.display = 'none';
-      document.getElementById('conn-status').style.display = 'none';
-      document.getElementById('brand-badge').style.opacity = '1';
-      document.getElementById('brand-badge').style.pointerEvents = '';
-      resetCards();
-      fotosPlay();
-    });
-
     /* ── VARIÁVEIS ── */
-    function resetCards() {
-      ['val-pressao','val-temperatura','val-vazao','val-ph','val-setpoint','val-ctrl']
-        .forEach(id => document.getElementById(id).textContent = '--');
-    }
+    let dosadorId = null;
 
     function setStatus(online) {
       const el = document.getElementById('conn-status');
@@ -381,9 +277,9 @@
     }
 
     async function buscarVariaveis() {
-      if (!dosadorAtivo) return;
+      if (!dosadorId) return;
       try {
-        const r = await fetch(`/api/variaveis/${dosadorAtivo}`);
+        const r = await fetch(`/api/variaveis/${dosadorId}`);
         if (!r.ok) throw new Error();
         const dados = await r.json();
         setStatus(dados.length > 0);
@@ -400,6 +296,14 @@
         document.getElementById('val-ctrl').textContent       = f1(m.pct_controle);
       } catch { setStatus(false); }
     }
+
+    fetch('/api/dosadores').then(r=>r.json()).then(lista => {
+      if (lista.length) {
+        dosadorId = lista[0].id;
+        buscarVariaveis();
+        setInterval(buscarVariaveis, 10000);
+      }
+    }).catch(() => {});
 
     /* ── PARTICLES ── */
     const PTYPES=['dot','dot','line','line','hex','hex','dot'], HEX=['FF','2A','C3','0E','7F','B1','A9'];

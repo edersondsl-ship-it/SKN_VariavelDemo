@@ -4,535 +4,572 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SKN — Monitor Dosador</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 
     :root {
-      --bg:         #0a0e17;
-      --surface:    #111827;
-      --surface2:   #1a2235;
-      --border:     #1e2d45;
-      --teal:       #0d9488;
-      --teal-light: #14b8a6;
-      --teal-glow:  rgba(13,148,136,.25);
-      --cyan:       #22d3ee;
-      --text:       #e2e8f0;
-      --muted:      #64748b;
-      --green:      #22c55e;
-      --red:        #ef4444;
-      --yellow:     #f59e0b;
-      --mono:       'JetBrains Mono', monospace;
+      --bg:     #162f2e;
+      --accent: #2dd4bf;
+      --dur:    1.4s;
     }
 
     html, body {
-      height: 100%;
-      font-family: 'Inter', sans-serif;
-      background: var(--bg);
-      color: var(--text);
+      width:100%; height:100%;
+      overflow:hidden;
+      font-family:'Poppins', sans-serif;
+      background:var(--bg);
     }
 
-    /* ── HEADER ────────────────────────────────── */
-    header {
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      padding: 0 28px;
-      height: 60px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+    /* ── BG LAYERS ── */
+    .bg-layer {
+      position:fixed; inset:0;
+      background-size:cover; background-position:center;
+      will-change:transform,opacity;
+      transition:opacity var(--dur) ease;
+    }
+    #bgA { z-index:0; opacity:1; }
+    #bgB { z-index:0; opacity:0; }
+
+    /* ── OVERLAY ── */
+    .overlay {
+      position:fixed; inset:0; z-index:1; pointer-events:none;
+      background:
+        linear-gradient(to bottom, rgba(20,60,55,.55) 0%, transparent 20%, transparent 75%, rgba(20,60,55,.65) 100%),
+        radial-gradient(ellipse 70% 70% at 50% 50%, rgba(18,45,43,.08) 0%, rgba(10,28,27,.75) 100%),
+        rgba(15,35,33,.5);
     }
 
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
+    /* ── GRID ── */
+    .grid {
+      position:fixed; inset:0; z-index:2; pointer-events:none;
+      background-image:
+        linear-gradient(rgba(255,255,255,.018) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.018) 1px, transparent 1px);
+      background-size:52px 52px;
     }
 
-    .brand-mark {
-      width: 36px; height: 36px;
-      background: linear-gradient(135deg, var(--teal), var(--cyan));
-      border-radius: 10px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 18px;
+    /* ── GRAIN ── */
+    .grain {
+      position:fixed; inset:0; z-index:3; pointer-events:none; opacity:.035;
+      background-image:url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/></filter><rect width='200' height='200' filter='url(%23n)'/></svg>");
+      background-size:180px;
     }
 
-    .brand-name   { font-size: 17px; font-weight: 700; color: #f1f5f9; }
-    .brand-sub    { font-size: 12px; color: var(--muted); margin-top: 1px; }
+    /* ── RINGS ── */
+    .rings { position:fixed; top:50%; left:50%; z-index:4; pointer-events:none; }
+    .ring  { position:absolute; border-radius:50%; will-change:transform; }
+    .ring:nth-child(1) {
+      width:320px; height:320px; top:-160px; left:-160px;
+      border:1px solid rgba(45,212,191,.08);
+      animation:ringCW 28s linear infinite;
+    }
+    .ring:nth-child(2) {
+      width:620px; height:620px; top:-310px; left:-310px;
+      border:1px solid rgba(45,212,191,.05);
+      animation:ringCCW 44s linear infinite;
+    }
+    .ring:nth-child(3) {
+      width:900px; height:900px; top:-450px; left:-450px;
+      border:1px solid rgba(45,212,191,.03);
+      animation:ringCW 62s linear infinite;
+    }
+    @keyframes ringCW  { to { transform:rotate( 360deg); } }
+    @keyframes ringCCW { to { transform:rotate(-360deg); } }
 
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 20px;
+    /* ── PARTICLES ── */
+    .particle {
+      position:fixed; pointer-events:none; z-index:5;
+      background:var(--accent);
+      animation:pFloat var(--pd,6s) var(--del,0s) linear infinite;
+    }
+    .particle.dot  { width:var(--sz,2px); height:var(--sz,2px); border-radius:50%; }
+    .particle.line { width:var(--sz,14px); height:1px; opacity:.5; }
+    .particle.hex  {
+      background:transparent; color:var(--accent);
+      font-size:.5rem; font-weight:600;
+      letter-spacing:1px; white-space:nowrap; opacity:0;
+    }
+    @keyframes pFloat {
+      0%  { opacity:0; transform:translate(0,0); }
+      15% { opacity:var(--op,.6); }
+      90% { opacity:var(--op,.6); }
+      100%{ opacity:0; transform:translate(var(--dx,0px),-90px); }
     }
 
-    .conn-pill {
-      display: flex; align-items: center; gap: 7px;
-      background: rgba(255,255,255,.04);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 5px 14px;
-      font-size: 12px;
-      color: var(--muted);
-      font-weight: 500;
+    /* ── CLOCK ── */
+    #hud-clock {
+      position:fixed; top:20px; right:32px; z-index:20;
+      color:rgba(255,255,255,.92); font-size:5.8rem; font-weight:800;
+      letter-spacing:8px; font-variant-numeric:tabular-nums; line-height:1;
+      text-shadow:0 0 44px rgba(45,212,191,.65);
+      animation:fadeUp .4s ease 1.2s both;
+    }
+    #hud-date {
+      position:fixed; top:118px; right:32px; z-index:20;
+      text-align:right; font-variant-numeric:tabular-nums;
+      animation:fadeUp .4s ease 1.3s both;
+    }
+    .hud-date-line1 {
+      font-size:2rem; font-weight:800; line-height:1;
+      color:rgba(255,255,255,.85); letter-spacing:4px;
+      text-shadow:0 0 22px rgba(45,212,191,.4);
+    }
+    .hud-date-line2 {
+      font-size:.85rem; font-weight:800;
+      color:rgba(45,212,191,.6);
+      letter-spacing:4px; text-transform:uppercase; margin-top:6px;
     }
 
-    .pulse {
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      background: var(--muted);
-      flex-shrink: 0;
+    /* ── BRAND BADGE (top-left) ── */
+    #brand-badge {
+      position:fixed; top:20px; left:26px; z-index:20;
+      white-space:nowrap; padding:1.5px; border-radius:18px;
+      background-image:linear-gradient(130deg,
+        rgba(45,212,191,.06) 0%, rgba(45,212,191,.7) 22%,
+        rgba(45,212,191,.06) 50%, rgba(45,212,191,.6) 78%,
+        rgba(45,212,191,.06) 100%);
+      background-size:300% 300%;
+      animation:badgeFadeIn .5s ease 1.0s both, auroraShift 5s ease-in-out 1.5s infinite;
+    }
+    .badge-inner {
+      display:flex; align-items:center; gap:14px;
+      background:rgba(14,32,31,.82);
+      border-radius:16.5px; padding:14px 28px;
+      backdrop-filter:blur(22px); -webkit-backdrop-filter:blur(22px);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.08);
+    }
+    .badge-icon {
+      font-size:1.6rem;
+      filter:drop-shadow(0 0 8px rgba(45,212,191,.6));
+    }
+    .badge-text { display:flex; flex-direction:column; }
+    .badge-title {
+      font-size:1.15rem; font-weight:900; letter-spacing:5px;
+      color:#fff; text-shadow:0 0 18px rgba(45,212,191,.6);
+    }
+    .badge-sub {
+      font-size:.62rem; font-weight:700; letter-spacing:3.5px;
+      text-transform:uppercase; color:rgba(45,212,191,.7);
+      margin-top:2px;
     }
 
-    .pulse.on {
-      background: var(--green);
-      box-shadow: 0 0 0 0 rgba(34,197,94,.6);
-      animation: ripple 1.6s infinite;
+    @keyframes badgeFadeIn { from{opacity:0} to{opacity:1} }
+    @keyframes auroraShift {
+      0%,100% { background-position:0% 50%; }
+      50%     { background-position:100% 50%; }
     }
 
-    .pulse.off { background: var(--red); }
-
-    @keyframes ripple {
-      0%   { box-shadow: 0 0 0 0 rgba(34,197,94,.6); }
-      70%  { box-shadow: 0 0 0 7px rgba(34,197,94,0); }
-      100% { box-shadow: 0 0 0 0 rgba(34,197,94,0); }
+    /* ── STATUS BOMBA (centro-topo das cards) ── */
+    #status-bar {
+      position:fixed; top:22px; left:50%; transform:translateX(-50%);
+      z-index:20; display:flex; align-items:center; gap:16px;
+      background:rgba(14,32,31,.78);
+      border:1px solid rgba(45,212,191,.2);
+      border-radius:14px; padding:12px 28px;
+      backdrop-filter:blur(18px);
+      animation:fadeUp .4s ease 1.4s both;
     }
-
-    .last-update {
-      font-size: 12px;
-      color: var(--muted);
-      font-family: var(--mono);
+    .bomba-nome {
+      font-size:.85rem; font-weight:700; letter-spacing:3px;
+      text-transform:uppercase; color:rgba(255,255,255,.75);
     }
-
-    /* ── STATUS BOMBA ────────────────────────────── */
-    .status-bomba {
-      display: flex; align-items: center; gap: 10px;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 7px 16px;
+    .sep {
+      width:1px; height:20px;
+      background:rgba(45,212,191,.2);
     }
-
-    .status-bomba .nome { font-size: 13px; font-weight: 600; color: #94a3b8; }
-
     .liga-badge {
-      padding: 4px 12px;
-      border-radius: 6px;
-      font-size: 13px;
-      font-weight: 700;
-      font-family: var(--mono);
-      letter-spacing: .05em;
+      font-size:.78rem; font-weight:800; letter-spacing:3px;
+      text-transform:uppercase; padding:4px 14px;
+      border-radius:6px;
     }
-
-    .liga-badge.on  {
-      background: rgba(20,184,166,.15);
-      color: var(--teal-light);
-      border: 1px solid rgba(20,184,166,.35);
+    .liga-badge.on {
+      background:rgba(45,212,191,.15);
+      color:#2dd4bf;
+      border:1px solid rgba(45,212,191,.35);
+      text-shadow:0 0 10px rgba(45,212,191,.7);
+      animation:ligaPulse 2s ease-in-out infinite;
     }
-
     .liga-badge.off {
-      background: rgba(100,116,139,.1);
-      color: var(--muted);
-      border: 1px solid var(--border);
+      background:rgba(100,116,139,.1);
+      color:rgba(200,200,200,.4);
+      border:1px solid rgba(100,116,139,.2);
+    }
+    @keyframes ligaPulse {
+      0%,100% { box-shadow:0 0 0 0 rgba(45,212,191,.3); }
+      50%     { box-shadow:0 0 0 5px rgba(45,212,191,0); }
     }
 
-    /* ── MAIN ──────────────────────────────────── */
-    main {
-      padding: 28px;
-      max-width: 1300px;
-      margin: 0 auto;
+    /* ── CARDS CONTAINER ── */
+    #cards-wrap {
+      position:fixed; bottom:60px; left:0; right:0;
+      z-index:20; padding:0 32px;
+      animation:fadeUp .5s ease 1.6s both;
     }
 
-    /* ── GRID PRINCIPAL ────────────────────────── */
-    .vars-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-      margin-bottom: 20px;
+    .vars-row {
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:14px;
+      max-width:980px;
+      margin:0 auto;
     }
+    .vars-row + .vars-row { margin-top:14px; }
 
-    /* card pH e Setpoint lado a lado na última linha */
-    .vars-grid-bottom {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 16px;
-    }
-
-    /* ── CARD ──────────────────────────────────── */
+    /* ── CARD ── */
     .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 22px 24px 20px;
-      position: relative;
-      overflow: hidden;
-      transition: border-color .25s, box-shadow .25s;
+      background:rgba(14,32,31,.72);
+      border:1px solid rgba(45,212,191,.15);
+      border-radius:14px;
+      padding:16px 20px 14px;
+      backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
+      transition:border-color .25s, box-shadow .25s;
+      position:relative; overflow:hidden;
     }
-
-    .card::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      border-radius: 16px;
-      background: linear-gradient(135deg, rgba(13,148,136,.06), transparent 60%);
-      pointer-events: none;
+    .card::before {
+      content:'';
+      position:absolute; top:0; left:16px; right:16px;
+      height:1.5px;
+      background:linear-gradient(90deg, transparent, rgba(45,212,191,.6), transparent);
     }
-
     .card:hover {
-      border-color: var(--teal);
-      box-shadow: 0 0 24px var(--teal-glow);
-    }
-
-    /* linha de acento topo */
-    .card-accent {
-      position: absolute;
-      top: 0; left: 24px; right: 24px;
-      height: 2px;
-      background: linear-gradient(90deg, var(--teal), var(--cyan));
-      border-radius: 0 0 4px 4px;
-      opacity: .7;
-    }
-
-    .card-icon {
-      font-size: 20px;
-      margin-bottom: 10px;
-      display: block;
+      border-color:rgba(45,212,191,.4);
+      box-shadow:0 0 28px rgba(45,212,191,.1);
     }
 
     .card-label {
-      font-size: 11px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: .1em;
-      color: var(--muted);
-      margin-bottom: 8px;
+      font-size:.6rem; font-weight:700;
+      text-transform:uppercase; letter-spacing:.12em;
+      color:rgba(45,212,191,.65);
+      margin-bottom:6px;
     }
 
     .card-value {
-      font-family: var(--mono);
-      font-size: 44px;
-      font-weight: 700;
-      color: #f8fafc;
-      line-height: 1;
-      letter-spacing: -.02em;
+      font-size:2.4rem; font-weight:800;
+      color:#fff; line-height:1;
+      letter-spacing:-.02em;
+      font-variant-numeric:tabular-nums;
+      text-shadow:0 0 28px rgba(45,212,191,.35);
     }
 
-    .card-value.large { font-size: 52px; }
-
     .card-unit {
-      font-size: 16px;
-      font-weight: 500;
-      color: var(--teal-light);
-      margin-left: 6px;
-      vertical-align: bottom;
-      line-height: 1.8;
+      font-size:.9rem; font-weight:600;
+      color:rgba(45,212,191,.7);
+      margin-left:5px;
     }
 
     .card-footer {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-top: 14px;
-      padding-top: 12px;
-      border-top: 1px solid rgba(255,255,255,.05);
+      display:flex; align-items:center; justify-content:space-between;
+      margin-top:8px; padding-top:8px;
+      border-top:1px solid rgba(255,255,255,.05);
     }
 
-    .card-range {
-      font-size: 11px;
-      color: var(--muted);
+    .card-icon { font-size:.9rem; opacity:.55; }
+
+    .trend {
+      font-size:.6rem; font-weight:700; letter-spacing:.05em;
+      padding:2px 7px; border-radius:5px;
     }
+    .trend.up   { background:rgba(239,68,68,.15); color:#fca5a5; }
+    .trend.down { background:rgba(96,165,250,.12); color:#93c5fd; }
+    .trend.ok   { background:rgba(45,212,191,.12); color:#5eead4; }
 
-    /* barra de progresso (% Controle) */
-    .progress-wrap {
-      margin-top: 12px;
-    }
-
-    .progress-track {
-      height: 6px;
-      background: rgba(255,255,255,.07);
-      border-radius: 10px;
-      overflow: hidden;
-    }
-
-    .progress-fill {
-      height: 100%;
-      background: linear-gradient(90deg, var(--teal), var(--cyan));
-      border-radius: 10px;
-      transition: width .6s cubic-bezier(.4,0,.2,1);
-    }
-
-    .progress-pct {
-      font-size: 11px;
-      color: var(--teal-light);
-      margin-top: 5px;
-      text-align: right;
-      font-family: var(--mono);
-    }
-
-    /* card de setpoint — estilo referência */
-    .card.setpoint {
-      border-color: rgba(34,211,238,.2);
-    }
-
-    .card.setpoint .card-value { color: var(--cyan); }
-
-    /* card pH com comparação */
-    .ph-compare {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-top: 10px;
-    }
-
+    /* pH diff */
     .ph-diff {
-      font-size: 12px;
-      font-family: var(--mono);
-      padding: 2px 8px;
-      border-radius: 6px;
-      font-weight: 600;
+      display:flex; align-items:center; gap:6px;
+      margin-top:6px;
+    }
+    .ph-diff-val {
+      font-size:.65rem; font-weight:700; padding:2px 8px;
+      border-radius:5px; font-variant-numeric:tabular-nums;
+    }
+    .ph-diff-val.acima  { background:rgba(239,68,68,.15); color:#fca5a5; }
+    .ph-diff-val.abaixo { background:rgba(245,158,11,.15); color:#fde68a; }
+    .ph-diff-val.ok     { background:rgba(45,212,191,.12); color:#5eead4; }
+
+    /* % Controle — barra */
+    .prog-track {
+      height:4px; border-radius:4px;
+      background:rgba(255,255,255,.07);
+      margin-top:8px; overflow:hidden;
+    }
+    .prog-fill {
+      height:100%; border-radius:4px;
+      background:linear-gradient(90deg, #0d9488, #2dd4bf);
+      transition:width .7s cubic-bezier(.4,0,.2,1);
     }
 
-    .ph-diff.acima  { background: rgba(239,68,68,.15); color: #fca5a5; }
-    .ph-diff.abaixo { background: rgba(245,158,11,.15); color: #fcd34d; }
-    .ph-diff.ok     { background: rgba(34,197,94,.12);  color: #86efac; }
-
-    /* ── EMPTY ─────────────────────────────────── */
-    .empty-state {
-      grid-column: 1 / -1;
-      text-align: center;
-      padding: 72px 24px;
-      color: var(--muted);
+    /* card setpoint — destaque diferente */
+    .card.setpoint {
+      border-color:rgba(96,165,250,.2);
+    }
+    .card.setpoint .card-value { color:#93c5fd; text-shadow:0 0 28px rgba(96,165,250,.4); }
+    .card.setpoint .card-label { color:rgba(96,165,250,.65); }
+    .card.setpoint::before {
+      background:linear-gradient(90deg, transparent, rgba(96,165,250,.5), transparent);
     }
 
-    .empty-state .icon { font-size: 52px; margin-bottom: 16px; }
-    .empty-state h3 { font-size: 18px; color: #94a3b8; margin-bottom: 8px; }
-    .empty-state p  { font-size: 14px; }
+    /* ── FOOTER ── */
+    footer {
+      position:fixed; bottom:20px; left:0; right:0; z-index:21;
+      display:flex; align-items:center; justify-content:center; gap:12px;
+      color:rgba(255,255,255,.4); font-size:.72rem;
+      letter-spacing:1.5px;
+      animation:fadeUp .4s ease 1.2s both;
+    }
+    footer::before, footer::after {
+      content:''; width:50px; height:1px;
+      background:linear-gradient(to right, transparent, rgba(45,212,191,.3));
+    }
+    footer::after { background:linear-gradient(to left, transparent, rgba(45,212,191,.3)); }
+    .ft-esl {
+      color:#fff; font-weight:800; letter-spacing:2px;
+      background:rgba(45,212,191,.1);
+      border:1px solid rgba(45,212,191,.25);
+      border-radius:5px; padding:1px 7px 2px;
+      text-shadow:0 0 10px rgba(45,212,191,.5);
+    }
+    .ft-dot {
+      width:3px; height:3px; border-radius:50%;
+      background:rgba(45,212,191,.4);
+      box-shadow:0 0 5px rgba(45,212,191,.4);
+    }
+    .ft-ver { color:rgba(45,212,191,.55); font-size:.68rem; font-weight:700; letter-spacing:1.5px; }
 
-    /* ── SPINNER ───────────────────────────────── */
-    .spinner {
-      display: inline-block;
-      width: 16px; height: 16px;
-      border: 2px solid var(--border);
-      border-top-color: var(--teal-light);
-      border-radius: 50%;
-      animation: spin .7s linear infinite;
+    @keyframes fadeUp {
+      from { opacity:0; transform:translateY(14px); }
+      to   { opacity:1; transform:translateY(0); }
     }
 
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* ── RESPONSIVE ────────────────────────────── */
-    @media (max-width: 900px) {
-      .vars-grid, .vars-grid-bottom { grid-template-columns: repeat(2, 1fr); }
+    /* ── RESPONSIVE ── */
+    @media (max-width: 760px) {
+      .vars-row { grid-template-columns:repeat(2,1fr); }
+      #hud-clock { font-size:3.8rem; letter-spacing:5px; }
+      #hud-date  { top:90px; }
+      .hud-date-line1 { font-size:1.4rem; }
+      #status-bar { padding:8px 18px; gap:10px; }
     }
 
-    @media (max-width: 560px) {
-      .vars-grid, .vars-grid-bottom { grid-template-columns: 1fr; }
-      main { padding: 16px; }
-      .card-value { font-size: 36px; }
+    @media (max-width: 480px) {
+      .vars-row { grid-template-columns:1fr; }
+      #cards-wrap { padding:0 16px; }
     }
   </style>
 </head>
 <body>
 
-  <header>
-    <div class="brand">
-      <div class="brand-mark">⚗️</div>
-      <div>
-        <div class="brand-name">SKN Demo</div>
-        <div class="brand-sub">Monitor de Dosadores</div>
+  <div class="bg-layer" id="bgA"></div>
+  <div class="bg-layer" id="bgB"></div>
+  <div class="overlay"></div>
+  <div class="grid"></div>
+  <div class="grain"></div>
+
+  <div class="rings">
+    <div class="ring"></div>
+    <div class="ring"></div>
+    <div class="ring"></div>
+  </div>
+
+  <!-- Relógio -->
+  <div id="hud-clock">--:--</div>
+  <div id="hud-date">
+    <div class="hud-date-line1" id="hud-date-d">--</div>
+    <div class="hud-date-line2" id="hud-date-m">--- --- ----</div>
+  </div>
+
+  <!-- Brand badge -->
+  <div id="brand-badge">
+    <div class="badge-inner">
+      <span class="badge-icon">⚗️</span>
+      <div class="badge-text">
+        <div class="badge-title">SKN</div>
+        <div class="badge-sub">Monitor Dosador</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Status da bomba -->
+  <div id="status-bar">
+    <span class="bomba-nome" id="nomeBomba">Bomba Dosadora 01</span>
+    <div class="sep"></div>
+    <span class="liga-badge on" id="ligaBadge">LIGA</span>
+  </div>
+
+  <!-- Cards de variáveis -->
+  <div id="cards-wrap">
+    <div class="vars-row">
+      <div class="card" id="card-pressao">
+        <div class="card-label">Pressão</div>
+        <div><span class="card-value" id="val-pressao">11.9</span><span class="card-unit">bar</span></div>
+        <div class="card-footer">
+          <span class="card-icon">🔵</span>
+          <span class="trend ok" id="trend-pressao">ESTÁVEL</span>
+        </div>
+      </div>
+
+      <div class="card" id="card-temperatura">
+        <div class="card-label">Temperatura</div>
+        <div><span class="card-value" id="val-temperatura">22.2</span><span class="card-unit">°C</span></div>
+        <div class="card-footer">
+          <span class="card-icon">🌡️</span>
+          <span class="trend ok" id="trend-temperatura">ESTÁVEL</span>
+        </div>
+      </div>
+
+      <div class="card" id="card-vazao">
+        <div class="card-label">Vazão</div>
+        <div><span class="card-value" id="val-vazao">2.4</span><span class="card-unit">l/min</span></div>
+        <div class="card-footer">
+          <span class="card-icon">💧</span>
+          <span class="trend ok" id="trend-vazao">ESTÁVEL</span>
+        </div>
       </div>
     </div>
 
-    <div class="header-right">
-      <div class="conn-pill">
-        <div class="pulse" id="connPulse"></div>
-        <span id="connLabel">Conectando…</span>
+    <div class="vars-row">
+      <div class="card" id="card-ph">
+        <div class="card-label">pH Medido</div>
+        <div><span class="card-value" id="val-ph">3.14</span><span class="card-unit">pH</span></div>
+        <div class="ph-diff">
+          <span class="ph-diff-val abaixo" id="ph-diff-val">-0.86 do SP</span>
+        </div>
       </div>
-      <span class="last-update" id="lastUpdate"></span>
-      <div class="status-bomba" id="statusBomba">
-        <span class="nome" id="nomeBomba">Bomba Dosadora 01</span>
-        <span class="liga-badge off" id="ligaBadge">—</span>
-      </div>
-    </div>
-  </header>
 
-  <main>
-    <div class="vars-grid" id="gridPrincipal">
-      <!-- Pressão, Temperatura, Vazão -->
+      <div class="card setpoint" id="card-setpoint">
+        <div class="card-label">Setpoint pH</div>
+        <div><span class="card-value" id="val-setpoint">4.00</span><span class="card-unit">pH</span></div>
+        <div class="card-footer">
+          <span class="card-icon">🎯</span>
+          <span class="trend ok">REFERÊNCIA</span>
+        </div>
+      </div>
+
+      <div class="card" id="card-ctrl">
+        <div class="card-label">% Controle</div>
+        <div><span class="card-value" id="val-ctrl">53.3</span><span class="card-unit">%</span></div>
+        <div class="prog-track">
+          <div class="prog-fill" id="prog-fill" style="width:53.3%"></div>
+        </div>
+      </div>
     </div>
-    <div class="vars-grid-bottom" id="gridBottom">
-      <!-- pH, Setpoint pH, % Controle -->
-    </div>
-  </main>
+  </div>
+
+  <footer>
+    <span>Desenvolvido por</span>
+    <span class="ft-esl">ESL</span>
+    <span class="ft-dot"></span>
+    <span class="ft-ver">SKN DEMO V 1.0</span>
+    <span class="ft-dot"></span>
+    <span class="ft-ver">© 2026</span>
+  </footer>
 
   <script>
-    const DOSADOR_ID = 1;
-    const POLL_MS    = 3000;
+    /* ── CLOCK ── */
+    const DAYS   = ['DOM','SEG','TER','QUA','QUI','SEX','SAB'];
+    const MONTHS = ['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ'];
+    const elClock = document.getElementById('hud-clock');
+    const elDay   = document.getElementById('hud-date-d');
+    const elMonth = document.getElementById('hud-date-m');
 
-    let spH = null; // guarda setpoint para calcular diff
+    function tick() {
+      const n = new Date(), p = v => String(v).padStart(2,'0');
+      elClock.textContent = `${p(n.getHours())}:${p(n.getMinutes())}`;
+      elDay.textContent   = p(n.getDate());
+      elMonth.textContent = `${DAYS[n.getDay()]}  ${MONTHS[n.getMonth()]}  ${n.getFullYear()}`;
+    }
+    tick();
+    setInterval(tick, 1000);
 
-    const VAR_ICONS = {
-      pressao:      '🔵',
-      temperatura:  '🌡️',
-      vazao:        '💧',
-      ph:           '🧪',
-      setpoint_ph:  '🎯',
-      pct_controle: '⚙️'
+    /* ── MOCK DATA ── */
+    const state = {
+      pressao:     { val: 11.9, base: 11.9, noise: 0.3,  dec: 1 },
+      temperatura: { val: 22.2, base: 22.2, noise: 0.2,  dec: 1 },
+      vazao:       { val:  2.4, base:  2.4, noise: 0.4,  dec: 1 },
+      ph:          { val: 3.14, base: 3.14, noise: 0.06, dec: 2 },
+      setpoint:    { val: 4.00, base: 4.00, noise: 0,    dec: 2 },
+      ctrl:        { val: 53.3, base: 53.3, noise: 3.5,  dec: 1 }
     };
 
-    async function buscar() {
-      try {
-        const r = await fetch(`/api/variaveis/${DOSADOR_ID}`);
-        if (!r.ok) throw new Error();
-        const dados = await r.json();
-        setConn(true);
-        renderizar(dados);
-      } catch {
-        setConn(false);
-      }
+    function fluct(s) {
+      const delta = (Math.random() - 0.5) * 2 * s.noise;
+      s.val = parseFloat((s.base + delta).toFixed(s.dec));
     }
 
-    function setConn(ok) {
-      document.getElementById('connPulse').className = 'pulse ' + (ok ? 'on' : 'off');
-      document.getElementById('connLabel').textContent = ok ? 'Online' : 'Sem dados';
-      if (ok) {
-        const now = new Date();
-        document.getElementById('lastUpdate').textContent =
-          now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-      }
+    function trendClass(val, base, threshold) {
+      const d = val - base;
+      if (Math.abs(d) < threshold) return ['ok', 'ESTÁVEL'];
+      return d > 0 ? ['up', '▲ SUBINDO'] : ['down', '▼ DESCENDO'];
     }
 
-    function renderizar(vars) {
-      if (!vars.length) {
-        const empty = `<div class="empty-state">
-          <div class="icon">📡</div>
-          <h3>Aguardando leituras</h3>
-          <p>O agente local ainda não enviou dados.</p>
-        </div>`;
-        document.getElementById('gridPrincipal').innerHTML = empty;
-        document.getElementById('gridBottom').innerHTML = '';
-        return;
-      }
+    function update() {
+      fluct(state.pressao);
+      fluct(state.temperatura);
+      fluct(state.vazao);
+      fluct(state.ph);
+      fluct(state.ctrl);
 
-      const mapa = {};
-      vars.forEach(v => mapa[v.nome_variavel] = v);
+      setText('val-pressao',    state.pressao.val.toFixed(1));
+      setText('val-temperatura', state.temperatura.val.toFixed(1));
+      setText('val-vazao',      state.vazao.val.toFixed(1));
+      setText('val-ph',         state.ph.val.toFixed(2));
+      setText('val-ctrl',       state.ctrl.val.toFixed(1));
 
-      // guarda setpoint para cálculo de diff do pH
-      if (mapa['setpoint_ph']) spH = parseFloat(mapa['setpoint_ph'].valor);
+      // Trends
+      setTrend('trend-pressao',    state.pressao.val,    11.9, 0.15);
+      setTrend('trend-temperatura', state.temperatura.val, 22.2, 0.1);
+      setTrend('trend-vazao',      state.vazao.val,       2.4, 0.2);
 
-      // Atualiza status bomba
-      if (mapa['status_bomba']) {
-        const liga = mapa['status_bomba'].valor === 1;
-        const badge = document.getElementById('ligaBadge');
-        badge.textContent  = liga ? 'LIGA' : 'DESLIGA';
-        badge.className    = 'liga-badge ' + (liga ? 'on' : 'off');
-      }
+      // pH diff
+      const sp   = state.setpoint.val;
+      const diff = parseFloat((state.ph.val - sp).toFixed(2));
+      const sign = diff >= 0 ? '+' : '';
+      const cls  = Math.abs(diff) < 0.1 ? 'ok' : diff > 0 ? 'acima' : 'abaixo';
+      const el   = document.getElementById('ph-diff-val');
+      el.textContent = `${sign}${diff} do SP`;
+      el.className   = `ph-diff-val ${cls}`;
 
-      // Grid principal: Pressão · Temperatura · Vazão
-      const principal = ['pressao', 'temperatura', 'vazao'];
-      document.getElementById('gridPrincipal').innerHTML =
-        principal.map(n => mapa[n] ? cardNumerico(mapa[n]) : '').join('');
-
-      // Grid inferior: pH · Setpoint pH · % Controle
-      const bottom = ['ph', 'setpoint_ph', 'pct_controle'];
-      document.getElementById('gridBottom').innerHTML =
-        bottom.map(n => {
-          if (!mapa[n]) return '';
-          if (n === 'pct_controle') return cardProgresso(mapa[n]);
-          if (n === 'setpoint_ph') return cardSetpoint(mapa[n]);
-          if (n === 'ph')          return cardPH(mapa[n]);
-          return cardNumerico(mapa[n]);
-        }).join('');
+      // Progress bar
+      const pct = Math.min(100, Math.max(0, state.ctrl.val));
+      document.getElementById('prog-fill').style.width = pct + '%';
+      const fillColor = pct > 85 ? '#ef4444' : pct > 65 ? '#f59e0b' : '#2dd4bf';
+      document.getElementById('prog-fill').style.background =
+        `linear-gradient(90deg, #0d9488, ${fillColor})`;
     }
 
-    function cardNumerico(v) {
-      const icon  = VAR_ICONS[v.nome_variavel] || '📊';
-      const label = formatLabel(v.nome_variavel);
-      const num   = formatNum(v.valor);
-      const unit  = v.unidade || '';
-      return `
-        <div class="card">
-          <div class="card-accent"></div>
-          <span class="card-icon">${icon}</span>
-          <div class="card-label">${label}</div>
-          <div class="card-value">${num}<span class="card-unit">${unit}</span></div>
-          <div class="card-footer">
-            <span class="card-range">Última leitura</span>
-          </div>
-        </div>`;
+    function setText(id, v) {
+      document.getElementById(id).textContent = v;
     }
 
-    function cardPH(v) {
-      const num = formatNum(v.valor);
-      let diffHtml = '';
-      if (spH !== null) {
-        const diff = parseFloat(v.valor) - spH;
-        const cls  = Math.abs(diff) < 0.1 ? 'ok' : diff > 0 ? 'acima' : 'abaixo';
-        const sinal = diff > 0 ? '+' : '';
-        diffHtml = `<span class="ph-diff ${cls}">${sinal}${diff.toFixed(2)} do SP</span>`;
-      }
-      return `
-        <div class="card">
-          <div class="card-accent"></div>
-          <span class="card-icon">🧪</span>
-          <div class="card-label">pH Medido</div>
-          <div class="card-value">${num}<span class="card-unit">pH</span></div>
-          <div class="ph-compare">${diffHtml}</div>
-        </div>`;
+    function setTrend(id, val, base, thr) {
+      const [cls, label] = trendClass(val, base, thr);
+      const el = document.getElementById(id);
+      el.textContent = label;
+      el.className   = `trend ${cls}`;
     }
 
-    function cardSetpoint(v) {
-      return `
-        <div class="card setpoint">
-          <div class="card-accent"></div>
-          <span class="card-icon">🎯</span>
-          <div class="card-label">Setpoint pH</div>
-          <div class="card-value">${formatNum(v.valor)}<span class="card-unit">pH</span></div>
-          <div class="card-footer">
-            <span class="card-range">Valor de referência</span>
-          </div>
-        </div>`;
-    }
+    update();
+    setInterval(update, 3000);
 
-    function cardProgresso(v) {
-      const pct = Math.min(100, Math.max(0, parseFloat(v.valor)));
-      const cor  = pct > 85 ? '#ef4444' : pct > 60 ? '#f59e0b' : 'var(--teal-light)';
-      return `
-        <div class="card">
-          <div class="card-accent"></div>
-          <span class="card-icon">⚙️</span>
-          <div class="card-label">% Controle</div>
-          <div class="card-value">${formatNum(pct)}<span class="card-unit">%</span></div>
-          <div class="progress-wrap">
-            <div class="progress-track">
-              <div class="progress-fill" style="width:${pct}%;background:linear-gradient(90deg,var(--teal),${cor})"></div>
-            </div>
-            <div class="progress-pct">${pct.toFixed(1)}%</div>
-          </div>
-        </div>`;
+    /* ── PARTICLES ── */
+    const PTYPES  = ['dot','dot','line','line','hex','hex','dot'];
+    const HEX_STR = ['FF','2A','C3','0E','7F','B1','A9'];
+    for (let i = 0; i < 7; i++) {
+      const el   = document.createElement('div');
+      const type = PTYPES[i];
+      el.className = `particle ${type}`;
+      if (type === 'hex') el.textContent = HEX_STR[i];
+      const x   = (4  + Math.random() * 92).toFixed(1);
+      const y   = (10 + Math.random() * 80).toFixed(1);
+      const dur = (6  + Math.random() * 9).toFixed(1);
+      const del = (Math.random() * 12).toFixed(2);
+      const dx  = ((Math.random() - .5) * 24).toFixed(1);
+      const op  = (type === 'hex' ? .4 + Math.random() * .25 : .25 + Math.random() * .4).toFixed(2);
+      const sz  = type === 'line'
+        ? (10 + Math.random() * 18).toFixed(0) + 'px'
+        : (2  + Math.random() * 2).toFixed(0)  + 'px';
+      el.style.cssText = `left:${x}%;top:${y}%;--sz:${sz};--pd:${dur}s;--del:${del}s;--dx:${dx}px;--op:${op};`;
+      document.body.appendChild(el);
     }
-
-    function formatNum(v) {
-      const n = parseFloat(v);
-      return isNaN(n) ? '—' : (n % 1 === 0 ? n.toFixed(1) : n.toFixed(2));
-    }
-
-    function formatLabel(n) {
-      const map = {
-        pressao:      'Pressão',
-        temperatura:  'Temperatura',
-        vazao:        'Vazão',
-        ph:           'pH Medido',
-        setpoint_ph:  'Setpoint pH',
-        pct_controle: '% Controle',
-        status_bomba: 'Bomba'
-      };
-      return map[n] || n.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
-    }
-
-    buscar();
-    setInterval(buscar, POLL_MS);
   </script>
 </body>
 </html>

@@ -342,6 +342,7 @@
   <div id="hud-date">
     <div class="hud-date-line1" id="hud-date-d">--</div>
     <div class="hud-date-line2" id="hud-date-m">--- --- ----</div>
+    <div id="conn-status" style="font-size:.62rem;font-weight:700;letter-spacing:2px;text-align:right;margin-top:6px;color:rgba(100,116,139,.6);">● AGUARDANDO</div>
   </div>
 
   <!-- Brand badge -->
@@ -436,75 +437,86 @@
     tick();
     setInterval(tick, 1000);
 
-    /* ── MOCK DATA ── */
-    const state = {
-      pressao:     { val: 11.9, base: 11.9, noise: 0.3,  dec: 1 },
-      temperatura: { val: 22.2, base: 22.2, noise: 0.2,  dec: 1 },
-      vazao:       { val:  2.4, base:  2.4, noise: 0.4,  dec: 1 },
-      ph:          { val: 3.14, base: 3.14, noise: 0.06, dec: 2 },
-      setpoint:    { val: 4.00, base: 4.00, noise: 0,    dec: 2 },
-      ctrl:        { val: 53.3, base: 53.3, noise: 3.5,  dec: 1 }
-    };
+    /* ── DADOS REAIS ── */
+    const DOSADOR_ID = 1;
+    const POLL_MS    = 10000;
 
-    function fluct(s) {
-      const delta = (Math.random() - 0.5) * 2 * s.noise;
-      s.val = parseFloat((s.base + delta).toFixed(s.dec));
-    }
+    // guarda leitura anterior para calcular tendência
+    const anterior = {};
 
-    function trendClass(val, base, threshold) {
-      const d = val - base;
-      if (Math.abs(d) < threshold) return ['ok', 'ESTÁVEL'];
+    function trendClass(nome, val) {
+      if (anterior[nome] === undefined) return ['ok', 'ESTÁVEL'];
+      const d = val - anterior[nome];
+      const thr = { pressao: 0.15, temperatura: 0.1, vazao: 0.2 };
+      const t = thr[nome] ?? 0.05;
+      if (Math.abs(d) < t) return ['ok', 'ESTÁVEL'];
       return d > 0 ? ['up', '▲ SUBINDO'] : ['down', '▼ DESCENDO'];
     }
 
-    function update() {
-      fluct(state.pressao);
-      fluct(state.temperatura);
-      fluct(state.vazao);
-      fluct(state.ph);
-      fluct(state.ctrl);
+    function renderDados(lista) {
+      const m = {};
+      lista.forEach(v => { m[v.nome_variavel] = parseFloat(v.valor); });
 
-      setText('val-pressao',    state.pressao.val.toFixed(1));
-      setText('val-temperatura', state.temperatura.val.toFixed(1));
-      setText('val-vazao',      state.vazao.val.toFixed(1));
-      setText('val-ph',         state.ph.val.toFixed(2));
-      setText('val-ctrl',       state.ctrl.val.toFixed(1));
+      const fmt1 = v => isNaN(v) ? '—' : v.toFixed(1);
+      const fmt2 = v => isNaN(v) ? '—' : v.toFixed(2);
+
+      // Valores numéricos
+      document.getElementById('val-pressao').textContent    = fmt1(m.pressao);
+      document.getElementById('val-temperatura').textContent = fmt1(m.temperatura);
+      document.getElementById('val-vazao').textContent      = fmt1(m.vazao);
+      document.getElementById('val-ph').textContent         = fmt2(m.ph);
+      document.getElementById('val-ctrl').textContent       = fmt1(m.pct_controle);
 
       // Trends
-      setTrend('trend-pressao',    state.pressao.val,    11.9, 0.15);
-      setTrend('trend-temperatura', state.temperatura.val, 22.2, 0.1);
-      setTrend('trend-vazao',      state.vazao.val,       2.4, 0.2);
+      ['pressao', 'temperatura', 'vazao'].forEach(nome => {
+        const val = m[nome];
+        if (isNaN(val)) return;
+        const [cls, label] = trendClass(nome, val);
+        const el = document.getElementById(`trend-${nome}`);
+        el.textContent = label;
+        el.className   = `trend ${cls}`;
+        anterior[nome] = val;
+      });
 
-      // pH diff
-      const sp   = state.setpoint.val;
-      const diff = parseFloat((state.ph.val - sp).toFixed(2));
-      const sign = diff >= 0 ? '+' : '';
-      const cls  = Math.abs(diff) < 0.1 ? 'ok' : diff > 0 ? 'acima' : 'abaixo';
-      const el   = document.getElementById('ph-diff-val');
-      el.textContent = `${sign}${diff} do SP`;
-      el.className   = `ph-diff-val ${cls}`;
+      // pH diff vs Setpoint
+      const sp   = m.setpoint_ph ?? NaN;
+      const ph   = m.ph ?? NaN;
+      const elDiff = document.getElementById('ph-diff-val');
+      if (!isNaN(sp) && !isNaN(ph)) {
+        const diff = parseFloat((ph - sp).toFixed(2));
+        const sign = diff >= 0 ? '+' : '';
+        const cls  = Math.abs(diff) < 0.1 ? 'ok' : diff > 0 ? 'acima' : 'abaixo';
+        elDiff.textContent = `${sign}${diff} do SP`;
+        elDiff.className   = `ph-diff-val ${cls}`;
+      }
 
-      // Progress bar
-      const pct = Math.min(100, Math.max(0, state.ctrl.val));
-      document.getElementById('prog-fill').style.width = pct + '%';
+      // Barra % Controle
+      const pct = isNaN(m.pct_controle) ? 0 : Math.min(100, Math.max(0, m.pct_controle));
       const fillColor = pct > 85 ? '#ef4444' : pct > 65 ? '#f59e0b' : '#2dd4bf';
-      document.getElementById('prog-fill').style.background =
-        `linear-gradient(90deg, #0d9488, ${fillColor})`;
+      document.getElementById('prog-fill').style.width      = pct + '%';
+      document.getElementById('prog-fill').style.background = `linear-gradient(90deg,#0d9488,${fillColor})`;
     }
 
-    function setText(id, v) {
-      document.getElementById(id).textContent = v;
+    function setStatus(online) {
+      const el = document.getElementById('conn-status');
+      el.textContent  = online ? '● ONLINE' : '● SEM SINAL';
+      el.style.color  = online ? 'rgba(45,212,191,.75)' : 'rgba(239,68,68,.7)';
     }
 
-    function setTrend(id, val, base, thr) {
-      const [cls, label] = trendClass(val, base, thr);
-      const el = document.getElementById(id);
-      el.textContent = label;
-      el.className   = `trend ${cls}`;
+    async function buscar() {
+      try {
+        const r = await fetch(`/api/variaveis/${DOSADOR_ID}`);
+        if (!r.ok) throw new Error();
+        const dados = await r.json();
+        setStatus(dados.length > 0);
+        if (dados.length) renderDados(dados);
+      } catch {
+        setStatus(false);
+      }
     }
 
-    update();
-    setInterval(update, 3000);
+    buscar();
+    setInterval(buscar, POLL_MS);
 
     /* ── PARTICLES ── */
     const PTYPES  = ['dot','dot','line','line','hex','hex','dot'];

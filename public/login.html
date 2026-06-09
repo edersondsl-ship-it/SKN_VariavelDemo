@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SKN Demo — Login</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #0f1117;
+      color: #e2e8f0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card {
+      background: #1a1d27;
+      border: 1px solid #2d3148;
+      border-radius: 16px;
+      padding: 48px 40px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 24px 64px rgba(0,0,0,.5);
+    }
+
+    .logo {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .logo-icon {
+      width: 56px;
+      height: 56px;
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 12px;
+      font-size: 24px;
+    }
+
+    .logo h1 { font-size: 22px; font-weight: 700; color: #f1f5f9; }
+    .logo p  { font-size: 13px; color: #64748b; margin-top: 4px; }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: #94a3b8;
+      margin-bottom: 6px;
+    }
+
+    input {
+      width: 100%;
+      background: #0f1117;
+      border: 1px solid #2d3148;
+      border-radius: 8px;
+      color: #e2e8f0;
+      font-size: 15px;
+      font-family: inherit;
+      padding: 10px 14px;
+      outline: none;
+      transition: border-color .2s;
+    }
+
+    input:focus { border-color: #3b82f6; }
+
+    .field { margin-bottom: 20px; }
+
+    button {
+      width: 100%;
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 600;
+      font-family: inherit;
+      padding: 12px;
+      cursor: pointer;
+      transition: opacity .2s;
+      margin-top: 8px;
+    }
+
+    button:hover { opacity: .88; }
+    button:disabled { opacity: .5; cursor: not-allowed; }
+
+    .erro {
+      background: rgba(239,68,68,.12);
+      border: 1px solid rgba(239,68,68,.3);
+      border-radius: 8px;
+      color: #fca5a5;
+      font-size: 13px;
+      padding: 10px 14px;
+      margin-top: 16px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">
+      <div class="logo-icon">⚗️</div>
+      <h1>SKN Demo</h1>
+      <p>Monitor de Dosadores</p>
+    </div>
+
+    <form id="formLogin">
+      <div class="field">
+        <label for="usuario">Usuário</label>
+        <input type="text" id="usuario" autocomplete="username" required>
+      </div>
+      <div class="field">
+        <label for="senha">Senha</label>
+        <input type="password" id="senha" autocomplete="current-password" required>
+      </div>
+      <button type="submit" id="btnEntrar">Entrar</button>
+      <div class="erro" id="msgErro"></div>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById('formLogin').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('btnEntrar');
+      const erro = document.getElementById('msgErro');
+      btn.disabled = true;
+      btn.textContent = 'Entrando…';
+      erro.style.display = 'none';
+
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            usuario: document.getElementById('usuario').value,
+            senha: document.getElementById('senha').value
+          })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          window.location.href = '/dashboard.html';
+        } else {
+          erro.textContent = data.error || 'Erro ao fazer login';
+          erro.style.display = 'block';
+        }
+      } catch {
+        erro.textContent = 'Erro de conexão com o servidor';
+        erro.style.display = 'block';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Entrar';
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SKN Demo — Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #0f1117;
+      --surface:  #1a1d27;
+      --border:   #2d3148;
+      --text:     #e2e8f0;
+      --muted:    #64748b;
+      --blue:     #3b82f6;
+      --purple:   #8b5cf6;
+      --green:    #22c55e;
+      --yellow:   #eab308;
+      --red:      #ef4444;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* NAV */
+    nav {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 16px;
+    }
+
+    .nav-icon {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, var(--blue), var(--purple));
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .status-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--muted);
+      background: rgba(255,255,255,.05);
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--muted);
+    }
+
+    .dot.online  { background: var(--green); box-shadow: 0 0 6px var(--green); }
+    .dot.offline { background: var(--red); }
+
+    .btn-logout {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 13px;
+      padding: 6px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all .2s;
+    }
+
+    .btn-logout:hover { border-color: var(--red); color: var(--red); }
+
+    /* MAIN */
+    main {
+      padding: 28px 24px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .page-title { font-size: 20px; font-weight: 700; }
+    .page-sub   { font-size: 13px; color: var(--muted); margin-top: 2px; }
+
+    .select-dosador {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 14px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      outline: none;
+    }
+
+    /* CARDS GRID */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+      transition: border-color .2s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--blue), var(--purple));
+      opacity: 0;
+      transition: opacity .2s;
+    }
+
+    .card:hover { border-color: #3d4166; }
+    .card:hover::before { opacity: 1; }
+
+    .card.alarme { border-color: rgba(239,68,68,.5); }
+    .card.alarme::before { opacity: 1; background: var(--red); }
+
+    .card-label {
+      font-size: 12px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+
+    .card-value {
+      font-size: 32px;
+      font-weight: 700;
+      color: #f8fafc;
+      line-height: 1;
+    }
+
+    .card-unit {
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--muted);
+      margin-left: 4px;
+    }
+
+    .card-updated {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 8px;
+    }
+
+    /* status bool */
+    .bool-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .bool-badge.on  { background: rgba(34,197,94,.15); color: var(--green); }
+    .bool-badge.off { background: rgba(100,116,139,.12); color: var(--muted); }
+    .bool-badge.alarm { background: rgba(239,68,68,.15); color: var(--red); }
+
+    /* UPDATE INFO */
+    .update-info {
+      font-size: 12px;
+      color: var(--muted);
+      text-align: right;
+      margin-bottom: 12px;
+    }
+
+    /* EMPTY STATE */
+    .empty {
+      text-align: center;
+      padding: 64px 24px;
+      color: var(--muted);
+    }
+
+    .empty-icon { font-size: 48px; margin-bottom: 16px; }
+    .empty h2   { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+    .empty p    { font-size: 14px; }
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="nav-brand">
+      <div class="nav-icon">⚗️</div>
+      SKN Demo
+    </div>
+    <div class="nav-right">
+      <div class="status-badge">
+        <div class="dot" id="connDot"></div>
+        <span id="connLabel">—</span>
+      </div>
+      <button class="btn-logout" onclick="logout()">Sair</button>
+    </div>
+  </nav>
+
+  <main>
+    <div class="page-header">
+      <div>
+        <div class="page-title">Monitor de Dosadores</div>
+        <div class="page-sub">Variáveis em tempo real da CPU1200</div>
+      </div>
+      <select class="select-dosador" id="selectDosador" onchange="trocarDosador()">
+        <option value="">Carregando…</option>
+      </select>
+    </div>
+
+    <div class="update-info" id="updateInfo">—</div>
+    <div class="grid" id="grid"></div>
+  </main>
+
+  <script>
+    let dosadorAtual = null;
+    let intervalo = null;
+
+    async function verificarAuth() {
+      const res = await fetch('/api/auth/me');
+      if (!res.ok) window.location.href = '/login.html';
+    }
+
+    async function carregarDosadores() {
+      const res = await fetch('/api/dosadores');
+      if (!res.ok) return;
+      const lista = await res.json();
+      const sel = document.getElementById('selectDosador');
+      sel.innerHTML = lista.map(d => `<option value="${d.id}">${d.nome}</option>`).join('');
+      if (lista.length) {
+        dosadorAtual = lista[0].id;
+        sel.value = dosadorAtual;
+        iniciarPolling();
+      } else {
+        sel.innerHTML = '<option value="">Nenhum dosador cadastrado</option>';
+        mostrarEmpty();
+      }
+    }
+
+    function trocarDosador() {
+      dosadorAtual = document.getElementById('selectDosador').value || null;
+      document.getElementById('grid').innerHTML = '';
+      if (dosadorAtual) iniciarPolling();
+    }
+
+    function iniciarPolling() {
+      if (intervalo) clearInterval(intervalo);
+      buscarVariaveis();
+      intervalo = setInterval(buscarVariaveis, 5000);
+    }
+
+    async function buscarVariaveis() {
+      if (!dosadorAtual) return;
+      try {
+        const res = await fetch(`/api/variaveis/${dosadorAtual}`);
+        if (!res.ok) throw new Error();
+        const dados = await res.json();
+        setStatus(true);
+        renderGrid(dados);
+      } catch {
+        setStatus(false);
+      }
+    }
+
+    function setStatus(online) {
+      const dot   = document.getElementById('connDot');
+      const label = document.getElementById('connLabel');
+      dot.className   = 'dot ' + (online ? 'online' : 'offline');
+      label.textContent = online ? 'Online' : 'Sem dados';
+    }
+
+    function renderGrid(variaveis) {
+      const grid = document.getElementById('grid');
+      const info = document.getElementById('updateInfo');
+
+      if (!variaveis.length) {
+        mostrarEmpty();
+        return;
+      }
+
+      info.textContent = 'Atualizado: ' + new Date().toLocaleTimeString('pt-BR');
+
+      grid.innerHTML = variaveis.map(v => {
+        const nome = formatarNome(v.nome_variavel);
+
+        // Variáveis booleanas (motor, alarme, etc.)
+        if (v.unidade === '' || v.unidade === null) {
+          const ligado  = v.valor === 1;
+          const eAlarme = v.nome_variavel.toLowerCase().includes('alarm');
+          const cls     = eAlarme && ligado ? 'alarm' : (ligado ? 'on' : 'off');
+          const txt     = eAlarme ? (ligado ? 'ALARME' : 'Normal') : (ligado ? 'Ligado' : 'Desligado');
+          return `
+            <div class="card ${eAlarme && ligado ? 'alarme' : ''}">
+              <div class="card-label">${nome}</div>
+              <span class="bool-badge ${cls}">${txt}</span>
+              <div class="card-updated">${formatarData(v.atualizado_em)}</div>
+            </div>`;
+        }
+
+        // Variáveis numéricas
+        return `
+          <div class="card">
+            <div class="card-label">${nome}</div>
+            <div class="card-value">
+              ${formatarNumero(v.valor)}<span class="card-unit">${v.unidade || ''}</span>
+            </div>
+            <div class="card-updated">${formatarData(v.atualizado_em)}</div>
+          </div>`;
+      }).join('');
+    }
+
+    function mostrarEmpty() {
+      document.getElementById('grid').innerHTML = `
+        <div class="empty" style="grid-column:1/-1">
+          <div class="empty-icon">📡</div>
+          <h2>Aguardando dados</h2>
+          <p>O agente local ainda não enviou leituras para este dosador.</p>
+        </div>`;
+    }
+
+    function formatarNome(nome) {
+      return nome.replace(/_/g, ' ')
+                 .replace(/\b\w/g, c => c.toUpperCase());
+    }
+
+    function formatarNumero(v) {
+      if (typeof v !== 'number') return v;
+      return v % 1 === 0 ? v.toFixed(0) : v.toFixed(2);
+    }
+
+    function formatarData(iso) {
+      if (!iso) return '';
+      return 'Atualizado: ' + new Date(iso).toLocaleTimeString('pt-BR');
+    }
+
+    async function logout() {
+      await fetch('/api/auth/logout', { method: 'POST' });
+      window.location.href = '/login.html';
+    }
+
+    verificarAuth().then(() => carregarDosadores());
+  </script>
+</body>
+</html>

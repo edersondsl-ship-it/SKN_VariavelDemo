@@ -3,30 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SKN — Monitor Dosador</title>
+  <title>SKN — Monitor Dosadores</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-
-    :root {
-      --bg:     #162f2e;
-      --accent: #2dd4bf;
-      --dur:    1.4s;
-    }
+    :root { --bg:#162f2e; --accent:#2dd4bf; --dur:1.4s; }
 
     html, body {
-      width:100%; height:100%;
-      overflow:hidden;
-      font-family:'Poppins', sans-serif;
-      background:var(--bg);
+      width:100%; height:100%; overflow:hidden;
+      font-family:'Poppins', sans-serif; background:var(--bg);
     }
 
     /* ── BG LAYERS ── */
     .bg-layer {
       position:fixed; inset:0;
       background-size:cover; background-position:center;
-      will-change:transform,opacity;
-      transition:opacity var(--dur) ease;
+      will-change:transform,opacity; transition:opacity var(--dur) ease;
     }
     #bgA { z-index:0; opacity:1; }
     #bgB { z-index:0; opacity:0; }
@@ -35,8 +27,8 @@
     .overlay {
       position:fixed; inset:0; z-index:1; pointer-events:none;
       background:
-        linear-gradient(to bottom, rgba(20,60,55,.55) 0%, transparent 20%, transparent 75%, rgba(20,60,55,.65) 100%),
-        radial-gradient(ellipse 70% 70% at 50% 50%, rgba(18,45,43,.08) 0%, rgba(10,28,27,.75) 100%),
+        linear-gradient(to bottom, rgba(20,60,55,.6) 0%, transparent 22%, transparent 75%, rgba(20,60,55,.7) 100%),
+        radial-gradient(ellipse 70% 70% at 50% 50%, rgba(18,45,43,.08) 0%, rgba(10,28,27,.78) 100%),
         rgba(15,35,33,.5);
     }
 
@@ -58,22 +50,10 @@
 
     /* ── RINGS ── */
     .rings { position:fixed; top:50%; left:50%; z-index:4; pointer-events:none; }
-    .ring  { position:absolute; border-radius:50%; will-change:transform; }
-    .ring:nth-child(1) {
-      width:320px; height:320px; top:-160px; left:-160px;
-      border:1px solid rgba(45,212,191,.08);
-      animation:ringCW 28s linear infinite;
-    }
-    .ring:nth-child(2) {
-      width:620px; height:620px; top:-310px; left:-310px;
-      border:1px solid rgba(45,212,191,.05);
-      animation:ringCCW 44s linear infinite;
-    }
-    .ring:nth-child(3) {
-      width:900px; height:900px; top:-450px; left:-450px;
-      border:1px solid rgba(45,212,191,.03);
-      animation:ringCW 62s linear infinite;
-    }
+    .ring  { position:absolute; border-radius:50%; }
+    .ring:nth-child(1) { width:340px; height:340px; top:-170px; left:-170px; border:1px solid rgba(45,212,191,.07); animation:ringCW 28s linear infinite; }
+    .ring:nth-child(2) { width:660px; height:660px; top:-330px; left:-330px; border:1px solid rgba(45,212,191,.045); animation:ringCCW 44s linear infinite; }
+    .ring:nth-child(3) { width:960px; height:960px; top:-480px; left:-480px; border:1px solid rgba(45,212,191,.025); animation:ringCW 62s linear infinite; }
     @keyframes ringCW  { to { transform:rotate( 360deg); } }
     @keyframes ringCCW { to { transform:rotate(-360deg); } }
 
@@ -86,17 +66,12 @@
 
     /* ── PARTICLES ── */
     .particle {
-      position:fixed; pointer-events:none; z-index:5;
-      background:var(--accent);
+      position:fixed; pointer-events:none; z-index:5; background:var(--accent);
       animation:pFloat var(--pd,6s) var(--del,0s) linear infinite;
     }
     .particle.dot  { width:var(--sz,2px); height:var(--sz,2px); border-radius:50%; }
     .particle.line { width:var(--sz,14px); height:1px; opacity:.5; }
-    .particle.hex  {
-      background:transparent; color:var(--accent);
-      font-size:.5rem; font-weight:600;
-      letter-spacing:1px; white-space:nowrap; opacity:0;
-    }
+    .particle.hex  { background:transparent; color:var(--accent); font-size:.5rem; font-weight:600; letter-spacing:1px; white-space:nowrap; opacity:0; }
     @keyframes pFloat {
       0%  { opacity:0; transform:translate(0,0); }
       15% { opacity:var(--op,.6); }
@@ -114,21 +89,12 @@
     }
     #hud-date {
       position:fixed; top:118px; right:32px; z-index:20;
-      text-align:right; font-variant-numeric:tabular-nums;
-      animation:fadeUp .4s ease 1.3s both;
+      text-align:right; animation:fadeUp .4s ease 1.3s both;
     }
-    .hud-date-line1 {
-      font-size:2rem; font-weight:800; line-height:1;
-      color:rgba(255,255,255,.85); letter-spacing:4px;
-      text-shadow:0 0 22px rgba(45,212,191,.4);
-    }
-    .hud-date-line2 {
-      font-size:.85rem; font-weight:800;
-      color:rgba(45,212,191,.6);
-      letter-spacing:4px; text-transform:uppercase; margin-top:6px;
-    }
+    .hud-date-line1 { font-size:2rem; font-weight:800; line-height:1; color:rgba(255,255,255,.85); letter-spacing:4px; text-shadow:0 0 22px rgba(45,212,191,.4); }
+    .hud-date-line2 { font-size:.85rem; font-weight:800; color:rgba(45,212,191,.6); letter-spacing:4px; text-transform:uppercase; margin-top:6px; }
 
-    /* ── BRAND BADGE (top-left) ── */
+    /* ── BRAND BADGE ── */
     #brand-badge {
       position:fixed; top:20px; left:26px; z-index:20;
       white-space:nowrap; padding:1.5px; border-radius:18px;
@@ -141,152 +107,105 @@
     }
     .badge-inner {
       display:flex; align-items:center; gap:14px;
-      background:rgba(14,32,31,.82);
-      border-radius:16.5px; padding:14px 28px;
-      backdrop-filter:blur(22px); -webkit-backdrop-filter:blur(22px);
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.08);
+      background:rgba(14,32,31,.82); border-radius:16.5px; padding:14px 28px;
+      backdrop-filter:blur(22px); box-shadow:inset 0 1px 0 rgba(255,255,255,.08);
     }
-    .badge-icon {
-      width:28px; height:28px;
-      filter:brightness(20) opacity(.85);
-    }
+    .badge-icon { width:28px; height:28px; filter:brightness(20) opacity(.85); }
     .badge-text { display:flex; flex-direction:column; }
-    .badge-title {
-      font-size:1.15rem; font-weight:900; letter-spacing:5px;
-      color:#fff; text-shadow:0 0 18px rgba(45,212,191,.6);
-    }
-    .badge-sub {
-      font-size:.62rem; font-weight:700; letter-spacing:3.5px;
-      text-transform:uppercase; color:rgba(45,212,191,.7);
-      margin-top:2px;
-    }
+    .badge-title { font-size:1.15rem; font-weight:900; letter-spacing:5px; color:#fff; text-shadow:0 0 18px rgba(45,212,191,.6); }
+    .badge-sub   { font-size:.62rem; font-weight:700; letter-spacing:3.5px; text-transform:uppercase; color:rgba(45,212,191,.7); margin-top:2px; }
 
     @keyframes badgeFadeIn { from{opacity:0} to{opacity:1} }
-    @keyframes auroraShift {
-      0%,100% { background-position:0% 50%; }
-      50%     { background-position:100% 50%; }
+    @keyframes auroraShift { 0%,100%{background-position:0% 50%} 50%{background-position:100% 50%} }
+
+    /* ── CENTRAL ── */
+    #central {
+      position:fixed; top:50%; left:50%;
+      transform:translate(-50%,-50%);
+      z-index:20; text-align:center;
+      animation:fadeUp .5s ease 1.5s both;
     }
 
-    /* ── CARDS CONTAINER ── */
-    #cards-wrap {
-      position:fixed; top:50%; left:0; right:0;
-      transform:translateY(-50%);
-      z-index:20; padding:0 32px;
-      animation:fadeUp .5s ease 1.6s both;
+    .central-label {
+      font-size:.65rem; font-weight:700; letter-spacing:.18em;
+      text-transform:uppercase; color:rgba(45,212,191,.6);
+      margin-bottom:28px;
     }
 
-    .vars-row {
-      display:grid;
-      grid-template-columns:repeat(3,1fr);
-      gap:14px;
-      max-width:980px;
-      margin:0 auto;
+    /* ── GRID DE DOSADORES ── */
+    #dosadores-grid {
+      display:flex; gap:16px; flex-wrap:wrap; justify-content:center;
     }
-    .vars-row + .vars-row { margin-top:14px; }
 
-    /* ── CARD ── */
-    .card {
-      background:rgba(14,32,31,.72);
-      border:1px solid rgba(45,212,191,.15);
-      border-radius:14px;
-      padding:16px 20px 14px;
-      backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
-      transition:border-color .25s, box-shadow .25s;
+    .dosador-card {
+      background:rgba(14,32,31,.78);
+      border:1px solid rgba(45,212,191,.18);
+      border-radius:18px; padding:28px 32px;
+      min-width:220px;
+      text-decoration:none;
+      display:flex; flex-direction:column; align-items:center; gap:10px;
+      backdrop-filter:blur(22px);
+      transition:border-color .25s, box-shadow .25s, transform .2s;
       position:relative; overflow:hidden;
     }
-    .card::before {
+    .dosador-card::before {
       content:'';
-      position:absolute; top:0; left:16px; right:16px;
-      height:1.5px;
-      background:linear-gradient(90deg, transparent, rgba(45,212,191,.6), transparent);
+      position:absolute; top:0; left:20px; right:20px; height:2px;
+      background:linear-gradient(90deg, transparent, rgba(45,212,191,.7), transparent);
     }
-    .card:hover {
-      border-color:rgba(45,212,191,.4);
-      box-shadow:0 0 28px rgba(45,212,191,.1);
-    }
-
-    .card-label {
-      font-size:.6rem; font-weight:700;
-      text-transform:uppercase; letter-spacing:.12em;
-      color:rgba(45,212,191,.65);
-      margin-bottom:6px;
+    .dosador-card:hover {
+      border-color:rgba(45,212,191,.5);
+      box-shadow:0 0 36px rgba(45,212,191,.15);
+      transform:translateY(-3px);
     }
 
-    .card-value {
-      font-size:2.4rem; font-weight:800;
-      color:#fff; line-height:1;
-      letter-spacing:-.02em;
-      font-variant-numeric:tabular-nums;
-      text-shadow:0 0 28px rgba(45,212,191,.35);
+    .dc-nome {
+      font-size:1rem; font-weight:800; letter-spacing:3px;
+      text-transform:uppercase; color:#fff;
+      text-shadow:0 0 16px rgba(45,212,191,.3);
+    }
+    .dc-desc {
+      font-size:.65rem; font-weight:500; letter-spacing:1.5px;
+      color:rgba(255,255,255,.4); text-align:center;
+    }
+    .dc-btn {
+      margin-top:8px;
+      font-size:.65rem; font-weight:800; letter-spacing:3px;
+      text-transform:uppercase; color:var(--accent);
+      border:1px solid rgba(45,212,191,.3);
+      border-radius:8px; padding:6px 18px;
+      transition:background .2s;
+    }
+    .dosador-card:hover .dc-btn {
+      background:rgba(45,212,191,.12);
     }
 
-    .card-unit {
-      font-size:.9rem; font-weight:600;
-      color:rgba(45,212,191,.7);
-      margin-left:5px;
-    }
-
-    /* card setpoint — destaque diferente */
-    .card.setpoint {
-      border-color:rgba(96,165,250,.2);
-    }
-    .card.setpoint .card-value { color:#93c5fd; text-shadow:0 0 28px rgba(96,165,250,.4); }
-    .card.setpoint .card-label { color:rgba(96,165,250,.65); }
-    .card.setpoint::before {
-      background:linear-gradient(90deg, transparent, rgba(96,165,250,.5), transparent);
+    .empty-msg {
+      font-size:.8rem; color:rgba(255,255,255,.35); letter-spacing:2px;
     }
 
     /* ── FOOTER ── */
     footer {
       position:fixed; bottom:20px; left:0; right:0; z-index:21;
       display:flex; align-items:center; justify-content:center; gap:12px;
-      color:rgba(255,255,255,.4); font-size:.72rem;
-      letter-spacing:1.5px;
+      color:rgba(255,255,255,.4); font-size:.72rem; letter-spacing:1.5px;
       animation:fadeUp .4s ease 1.2s both;
     }
-    footer::before, footer::after {
-      content:''; width:50px; height:1px;
-      background:linear-gradient(to right, transparent, rgba(45,212,191,.3));
-    }
+    footer::before, footer::after { content:''; width:50px; height:1px; background:linear-gradient(to right, transparent, rgba(45,212,191,.3)); }
     footer::after { background:linear-gradient(to left, transparent, rgba(45,212,191,.3)); }
-    .ft-esl {
-      color:#fff; font-weight:800; letter-spacing:2px;
-      background:rgba(45,212,191,.1);
-      border:1px solid rgba(45,212,191,.25);
-      border-radius:5px; padding:1px 7px 2px;
-      text-shadow:0 0 10px rgba(45,212,191,.5);
-    }
-    .ft-dot {
-      width:3px; height:3px; border-radius:50%;
-      background:rgba(45,212,191,.4);
-      box-shadow:0 0 5px rgba(45,212,191,.4);
-    }
+    .ft-esl { color:#fff; font-weight:800; letter-spacing:2px; background:rgba(45,212,191,.1); border:1px solid rgba(45,212,191,.25); border-radius:5px; padding:1px 7px 2px; text-shadow:0 0 10px rgba(45,212,191,.5); }
+    .ft-dot { width:3px; height:3px; border-radius:50%; background:rgba(45,212,191,.4); box-shadow:0 0 5px rgba(45,212,191,.4); }
     .ft-ver { color:rgba(45,212,191,.55); font-size:.68rem; font-weight:700; letter-spacing:1.5px; }
 
     /* ── MARCA D'ÁGUA ── */
-    .bg-wm {
-      position:fixed; bottom:10px; right:-28px;
-      width:280px; opacity:.055;
-      filter:brightness(20);
-      pointer-events:none; z-index:6;
-    }
+    .bg-wm { position:fixed; bottom:10px; right:-28px; width:280px; opacity:.055; filter:brightness(20); pointer-events:none; z-index:6; }
 
-    @keyframes fadeUp {
-      from { opacity:0; transform:translateY(14px); }
-      to   { opacity:1; transform:translateY(0); }
-    }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
 
-    /* ── RESPONSIVE ── */
-    @media (max-width: 760px) {
-      .vars-row { grid-template-columns:repeat(2,1fr); }
+    @media (max-width:760px) {
       #hud-clock { font-size:3.8rem; letter-spacing:5px; }
-      #hud-date  { top:90px; }
+      #hud-date  { top:88px; }
       .hud-date-line1 { font-size:1.4rem; }
-    }
-
-    @media (max-width: 480px) {
-      .vars-row { grid-template-columns:1fr; }
-      #cards-wrap { padding:0 16px; }
     }
   </style>
 </head>
@@ -305,60 +224,25 @@
     <div class="ring"></div>
   </div>
 
-  <!-- Relógio -->
   <div id="hud-clock">--:--</div>
   <div id="hud-date">
     <div class="hud-date-line1" id="hud-date-d">--</div>
     <div class="hud-date-line2" id="hud-date-m">--- --- ----</div>
-    <div id="conn-status" style="font-size:.62rem;font-weight:700;letter-spacing:2px;text-align:right;margin-top:6px;color:rgba(100,116,139,.6);">● AGUARDANDO</div>
   </div>
 
-  <!-- Brand badge -->
   <div id="brand-badge">
     <div class="badge-inner">
       <img class="badge-icon" src="img/Logo.png" alt="SKN">
       <div class="badge-text">
         <div class="badge-title">SKN</div>
-        <div class="badge-sub">Monitor Dosador</div>
+        <div class="badge-sub">Monitor Dosadores</div>
       </div>
     </div>
   </div>
 
-  <!-- Cards de variáveis -->
-  <div id="cards-wrap">
-    <div class="vars-row">
-      <div class="card">
-        <div class="card-label">Pressão</div>
-        <div><span class="card-value" id="val-pressao">--</span><span class="card-unit">bar</span></div>
-      </div>
-
-      <div class="card">
-        <div class="card-label">Temperatura</div>
-        <div><span class="card-value" id="val-temperatura">--</span><span class="card-unit">°C</span></div>
-      </div>
-
-      <div class="card">
-        <div class="card-label">Vazão</div>
-        <div><span class="card-value" id="val-vazao">--</span><span class="card-unit">l/min</span></div>
-      </div>
-    </div>
-
-    <div class="vars-row">
-      <div class="card">
-        <div class="card-label">pH Medido</div>
-        <div><span class="card-value" id="val-ph">--</span><span class="card-unit">pH</span></div>
-      </div>
-
-      <div class="card setpoint">
-        <div class="card-label">Setpoint pH</div>
-        <div><span class="card-value" id="val-setpoint">--</span><span class="card-unit">pH</span></div>
-      </div>
-
-      <div class="card">
-        <div class="card-label">% Controle</div>
-        <div><span class="card-value" id="val-ctrl">--</span><span class="card-unit">%</span></div>
-      </div>
-    </div>
+  <div id="central">
+    <div class="central-label">Selecione o dosador</div>
+    <div id="dosadores-grid"></div>
   </div>
 
   <footer>
@@ -386,12 +270,10 @@
     tick(); setInterval(tick, 1000);
 
     /* ── FOTOS BACKGROUND ── */
-    const KBS            = ['kb1','kb2','kb3','kb4','kb5'];
-    const PHOTO_INTERVAL = 8000;
-    const STAGE_LEAD_MS  = 3500;
+    const KBS = ['kb1','kb2','kb3','kb4','kb5'];
+    const PHOTO_INTERVAL = 8000, STAGE_LEAD_MS = 3500;
     let photoCurrent = 0, useA = true, stagedIdx = 1;
-    const bgA = document.getElementById('bgA');
-    const bgB = document.getElementById('bgB');
+    const bgA = document.getElementById('bgA'), bgB = document.getElementById('bgB');
     const validPhotos = [];
 
     function preload(photos, done) {
@@ -399,103 +281,72 @@
       let n = photos.length;
       photos.forEach(p => {
         const img = new Image();
-        img.onload  = () => { validPhotos.push(p); if (--n === 0) done(); };
-        img.onerror = () => { if (--n === 0) done(); };
+        img.onload  = () => { validPhotos.push(p); if (--n===0) done(); };
+        img.onerror = () => { if (--n===0) done(); };
         img.src = p.src;
       });
     }
-    function applyKB(el, anim) {
-      el.style.animation = 'none'; el.offsetHeight;
-      el.style.animation = `${anim} 14s ease-out forwards`;
-    }
-    function showFirst() {
-      const p = validPhotos[0];
-      bgA.style.backgroundImage = `url('${p.src}')`;
-      bgA.style.opacity = '1'; bgB.style.opacity = '0';
-      applyKB(bgA, p.kb);
-    }
+    function applyKB(el, anim) { el.style.animation='none'; el.offsetHeight; el.style.animation=`${anim} 14s ease-out forwards`; }
+    function showFirst() { const p=validPhotos[0]; bgA.style.backgroundImage=`url('${p.src}')`; bgA.style.opacity='1'; bgB.style.opacity='0'; applyKB(bgA,p.kb); }
     function stageNext() {
-      if (validPhotos.length < 2) return;
-      stagedIdx = (photoCurrent + 1) % validPhotos.length;
-      const inc = useA ? bgB : bgA;
-      inc.style.backgroundImage = `url('${validPhotos[stagedIdx].src}')`;
-      inc.style.opacity = '0'; inc.style.animation = 'none';
+      if (validPhotos.length<2) return;
+      stagedIdx=(photoCurrent+1)%validPhotos.length;
+      const inc=useA?bgB:bgA;
+      inc.style.backgroundImage=`url('${validPhotos[stagedIdx].src}')`;
+      inc.style.opacity='0'; inc.style.animation='none';
     }
     function crossfade() {
-      if (validPhotos.length < 2) return;
-      const p   = validPhotos[stagedIdx];
-      const inc = useA ? bgB : bgA;
-      const out = useA ? bgA : bgB;
-      applyKB(inc, p.kb);
-      requestAnimationFrame(() => requestAnimationFrame(() => {
-        inc.style.opacity = '1'; out.style.opacity = '0';
-      }));
-      useA = !useA; photoCurrent = stagedIdx;
-      setTimeout(stageNext, PHOTO_INTERVAL - STAGE_LEAD_MS);
+      if (validPhotos.length<2) return;
+      const p=validPhotos[stagedIdx], inc=useA?bgB:bgA, out=useA?bgA:bgB;
+      applyKB(inc,p.kb);
+      requestAnimationFrame(()=>requestAnimationFrame(()=>{ inc.style.opacity='1'; out.style.opacity='0'; }));
+      useA=!useA; photoCurrent=stagedIdx;
+      setTimeout(stageNext, PHOTO_INTERVAL-STAGE_LEAD_MS);
       setTimeout(crossfade, PHOTO_INTERVAL);
     }
 
-    fetch('/api/foto-marketing')
+    fetch('/api/foto-marketing').then(r=>r.json()).then(files=>{
+      const photos = files.map((f,i)=>({ src:`/Foto_marketing/${encodeURIComponent(f)}`, kb:KBS[i%KBS.length] }));
+      preload(photos, ()=>{
+        if (!validPhotos.length) return;
+        showFirst();
+        if (validPhotos.length>1) { stageNext(); setTimeout(crossfade, PHOTO_INTERVAL); }
+      });
+    }).catch(()=>{});
+
+    /* ── DOSADORES ── */
+    const grid = document.getElementById('dosadores-grid');
+
+    fetch('/api/dosadores')
       .then(r => r.json())
-      .then(files => {
-        const photos = files.map((f, i) => ({
-          src: `/Foto_marketing/${encodeURIComponent(f)}`,
-          kb: KBS[i % KBS.length],
-        }));
-        preload(photos, () => {
-          if (!validPhotos.length) return;
-          showFirst();
-          if (validPhotos.length > 1) { stageNext(); setTimeout(crossfade, PHOTO_INTERVAL); }
-        });
+      .then(lista => {
+        if (!lista.length) {
+          grid.innerHTML = '<span class="empty-msg">Nenhum dosador cadastrado</span>';
+          return;
+        }
+        grid.innerHTML = lista.map(d => `
+          <a class="dosador-card" href="/dosador.html?id=${d.id}">
+            <div class="dc-nome">${d.nome}</div>
+            ${d.descricao ? `<div class="dc-desc">${d.descricao}</div>` : ''}
+            <div class="dc-btn">Ver variáveis ›</div>
+          </a>`).join('');
       })
-      .catch(() => {});
-
-    /* ── DADOS REAIS ── */
-    const DOSADOR_ID = 1;
-
-    function renderDados(lista) {
-      const m = {};
-      lista.forEach(v => { m[v.nome_variavel] = parseFloat(v.valor); });
-      const fmt1 = v => isNaN(v) ? '--' : v.toFixed(1);
-      const fmt2 = v => isNaN(v) ? '--' : v.toFixed(2);
-      document.getElementById('val-pressao').textContent     = fmt1(m.pressao);
-      document.getElementById('val-temperatura').textContent  = fmt1(m.temperatura);
-      document.getElementById('val-vazao').textContent       = fmt1(m.vazao);
-      document.getElementById('val-ph').textContent          = fmt2(m.ph);
-      document.getElementById('val-setpoint').textContent    = fmt2(m.setpoint_ph);
-      document.getElementById('val-ctrl').textContent        = fmt1(m.pct_controle);
-    }
-
-    function setStatus(online) {
-      const el = document.getElementById('conn-status');
-      el.textContent = online ? '● ONLINE' : '● SEM SINAL';
-      el.style.color = online ? 'rgba(45,212,191,.75)' : 'rgba(239,68,68,.7)';
-    }
-
-    async function buscar() {
-      try {
-        const r = await fetch(`/api/variaveis/${DOSADOR_ID}`);
-        if (!r.ok) throw new Error();
-        const dados = await r.json();
-        setStatus(dados.length > 0);
-        if (dados.length) renderDados(dados);
-      } catch { setStatus(false); }
-    }
-    buscar(); setInterval(buscar, 10000);
+      .catch(() => {
+        grid.innerHTML = '<span class="empty-msg">Erro ao carregar dosadores</span>';
+      });
 
     /* ── PARTICLES ── */
-    const PTYPES  = ['dot','dot','line','line','hex','hex','dot'];
-    const HEX_STR = ['FF','2A','C3','0E','7F','B1','A9'];
-    for (let i = 0; i < 7; i++) {
-      const el = document.createElement('div'), type = PTYPES[i];
-      el.className = `particle ${type}`;
-      if (type === 'hex') el.textContent = HEX_STR[i];
-      const x = (4 + Math.random()*92).toFixed(1), y = (10+Math.random()*80).toFixed(1);
-      const dur = (6+Math.random()*9).toFixed(1), del = (Math.random()*12).toFixed(2);
-      const dx = ((Math.random()-.5)*24).toFixed(1);
-      const op = (type==='hex'?.4+Math.random()*.25:.25+Math.random()*.4).toFixed(2);
-      const sz = type==='line'?(10+Math.random()*18).toFixed(0)+'px':(2+Math.random()*2).toFixed(0)+'px';
-      el.style.cssText = `left:${x}%;top:${y}%;--sz:${sz};--pd:${dur}s;--del:${del}s;--dx:${dx}px;--op:${op};`;
+    const PTYPES=['dot','dot','line','line','hex','hex','dot'], HEX_STR=['FF','2A','C3','0E','7F','B1','A9'];
+    for (let i=0;i<7;i++) {
+      const el=document.createElement('div'), type=PTYPES[i];
+      el.className=`particle ${type}`;
+      if (type==='hex') el.textContent=HEX_STR[i];
+      const x=(4+Math.random()*92).toFixed(1), y=(10+Math.random()*80).toFixed(1);
+      const dur=(6+Math.random()*9).toFixed(1), del=(Math.random()*12).toFixed(2);
+      const dx=((Math.random()-.5)*24).toFixed(1);
+      const op=(type==='hex'?.4+Math.random()*.25:.25+Math.random()*.4).toFixed(2);
+      const sz=type==='line'?(10+Math.random()*18).toFixed(0)+'px':(2+Math.random()*2).toFixed(0)+'px';
+      el.style.cssText=`left:${x}%;top:${y}%;--sz:${sz};--pd:${dur}s;--del:${del}s;--dx:${dx}px;--op:${op};`;
       document.body.appendChild(el);
     }
   </script>

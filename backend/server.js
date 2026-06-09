@@ -42,6 +42,17 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/variaveis', require('./routes/variaveis'));
 app.use('/api/dosadores', require('./routes/dosadores'));
 
+app.get('/api/health', async (req, res) => {
+  const db = require('./db');
+  try {
+    await db.query('SELECT 1');
+    const [[{ cnt }]] = await db.query('SELECT COUNT(*) as cnt FROM dosadores');
+    res.json({ ok: true, db: 'conectado', dosadores: cnt });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
 app.get('/api/foto-marketing', (req, res) => {
   const dir = path.join(__dirname, '../public/Foto_marketing');
   try {

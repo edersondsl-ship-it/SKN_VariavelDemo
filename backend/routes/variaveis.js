@@ -27,8 +27,8 @@ router.post('/', requireAgentToken, async (req, res) => {
 
     res.json({ ok: true, inseridos: rows.length });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Erro ao salvar' });
+    console.error('[DB ERROR]', err);
+    res.status(500).json({ error: 'Erro ao salvar', detail: err.message });
   }
 });
 

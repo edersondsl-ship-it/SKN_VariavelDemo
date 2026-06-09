@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SKN — Monitor Dosador</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:         #0a0e17;
+      --surface:    #111827;
+      --surface2:   #1a2235;
+      --border:     #1e2d45;
+      --teal:       #0d9488;
+      --teal-light: #14b8a6;
+      --teal-glow:  rgba(13,148,136,.25);
+      --cyan:       #22d3ee;
+      --text:       #e2e8f0;
+      --muted:      #64748b;
+      --green:      #22c55e;
+      --red:        #ef4444;
+      --yellow:     #f59e0b;
+      --mono:       'JetBrains Mono', monospace;
+    }
+
+    html, body {
+      height: 100%;
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    /* ── HEADER ────────────────────────────────── */
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 28px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-mark {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, var(--teal), var(--cyan));
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+
+    .brand-name   { font-size: 17px; font-weight: 700; color: #f1f5f9; }
+    .brand-sub    { font-size: 12px; color: var(--muted); margin-top: 1px; }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .conn-pill {
+      display: flex; align-items: center; gap: 7px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 5px 14px;
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .pulse {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--muted);
+      flex-shrink: 0;
+    }
+
+    .pulse.on {
+      background: var(--green);
+      box-shadow: 0 0 0 0 rgba(34,197,94,.6);
+      animation: ripple 1.6s infinite;
+    }
+
+    .pulse.off { background: var(--red); }
+
+    @keyframes ripple {
+      0%   { box-shadow: 0 0 0 0 rgba(34,197,94,.6); }
+      70%  { box-shadow: 0 0 0 7px rgba(34,197,94,0); }
+      100% { box-shadow: 0 0 0 0 rgba(34,197,94,0); }
+    }
+
+    .last-update {
+      font-size: 12px;
+      color: var(--muted);
+      font-family: var(--mono);
+    }
+
+    /* ── STATUS BOMBA ────────────────────────────── */
+    .status-bomba {
+      display: flex; align-items: center; gap: 10px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 7px 16px;
+    }
+
+    .status-bomba .nome { font-size: 13px; font-weight: 600; color: #94a3b8; }
+
+    .liga-badge {
+      padding: 4px 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      font-family: var(--mono);
+      letter-spacing: .05em;
+    }
+
+    .liga-badge.on  {
+      background: rgba(20,184,166,.15);
+      color: var(--teal-light);
+      border: 1px solid rgba(20,184,166,.35);
+    }
+
+    .liga-badge.off {
+      background: rgba(100,116,139,.1);
+      color: var(--muted);
+      border: 1px solid var(--border);
+    }
+
+    /* ── MAIN ──────────────────────────────────── */
+    main {
+      padding: 28px;
+      max-width: 1300px;
+      margin: 0 auto;
+    }
+
+    /* ── GRID PRINCIPAL ────────────────────────── */
+    .vars-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    /* card pH e Setpoint lado a lado na última linha */
+    .vars-grid-bottom {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+    }
+
+    /* ── CARD ──────────────────────────────────── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 22px 24px 20px;
+      position: relative;
+      overflow: hidden;
+      transition: border-color .25s, box-shadow .25s;
+    }
+
+    .card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 16px;
+      background: linear-gradient(135deg, rgba(13,148,136,.06), transparent 60%);
+      pointer-events: none;
+    }
+
+    .card:hover {
+      border-color: var(--teal);
+      box-shadow: 0 0 24px var(--teal-glow);
+    }
+
+    /* linha de acento topo */
+    .card-accent {
+      position: absolute;
+      top: 0; left: 24px; right: 24px;
+      height: 2px;
+      background: linear-gradient(90deg, var(--teal), var(--cyan));
+      border-radius: 0 0 4px 4px;
+      opacity: .7;
+    }
+
+    .card-icon {
+      font-size: 20px;
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    .card-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .card-value {
+      font-family: var(--mono);
+      font-size: 44px;
+      font-weight: 700;
+      color: #f8fafc;
+      line-height: 1;
+      letter-spacing: -.02em;
+    }
+
+    .card-value.large { font-size: 52px; }
+
+    .card-unit {
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--teal-light);
+      margin-left: 6px;
+      vertical-align: bottom;
+      line-height: 1.8;
+    }
+
+    .card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(255,255,255,.05);
+    }
+
+    .card-range {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    /* barra de progresso (% Controle) */
+    .progress-wrap {
+      margin-top: 12px;
+    }
+
+    .progress-track {
+      height: 6px;
+      background: rgba(255,255,255,.07);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--teal), var(--cyan));
+      border-radius: 10px;
+      transition: width .6s cubic-bezier(.4,0,.2,1);
+    }
+
+    .progress-pct {
+      font-size: 11px;
+      color: var(--teal-light);
+      margin-top: 5px;
+      text-align: right;
+      font-family: var(--mono);
+    }
+
+    /* card de setpoint — estilo referência */
+    .card.setpoint {
+      border-color: rgba(34,211,238,.2);
+    }
+
+    .card.setpoint .card-value { color: var(--cyan); }
+
+    /* card pH com comparação */
+    .ph-compare {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .ph-diff {
+      font-size: 12px;
+      font-family: var(--mono);
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-weight: 600;
+    }
+
+    .ph-diff.acima  { background: rgba(239,68,68,.15); color: #fca5a5; }
+    .ph-diff.abaixo { background: rgba(245,158,11,.15); color: #fcd34d; }
+    .ph-diff.ok     { background: rgba(34,197,94,.12);  color: #86efac; }
+
+    /* ── EMPTY ─────────────────────────────────── */
+    .empty-state {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 72px 24px;
+      color: var(--muted);
+    }
+
+    .empty-state .icon { font-size: 52px; margin-bottom: 16px; }
+    .empty-state h3 { font-size: 18px; color: #94a3b8; margin-bottom: 8px; }
+    .empty-state p  { font-size: 14px; }
+
+    /* ── SPINNER ───────────────────────────────── */
+    .spinner {
+      display: inline-block;
+      width: 16px; height: 16px;
+      border: 2px solid var(--border);
+      border-top-color: var(--teal-light);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── RESPONSIVE ────────────────────────────── */
+    @media (max-width: 900px) {
+      .vars-grid, .vars-grid-bottom { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 560px) {
+      .vars-grid, .vars-grid-bottom { grid-template-columns: 1fr; }
+      main { padding: 16px; }
+      .card-value { font-size: 36px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <div class="brand-mark">⚗️</div>
+      <div>
+        <div class="brand-name">SKN Demo</div>
+        <div class="brand-sub">Monitor de Dosadores</div>
+      </div>
+    </div>
+
+    <div class="header-right">
+      <div class="conn-pill">
+        <div class="pulse" id="connPulse"></div>
+        <span id="connLabel">Conectando…</span>
+      </div>
+      <span class="last-update" id="lastUpdate"></span>
+      <div class="status-bomba" id="statusBomba">
+        <span class="nome" id="nomeBomba">Bomba Dosadora 01</span>
+        <span class="liga-badge off" id="ligaBadge">—</span>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="vars-grid" id="gridPrincipal">
+      <!-- Pressão, Temperatura, Vazão -->
+    </div>
+    <div class="vars-grid-bottom" id="gridBottom">
+      <!-- pH, Setpoint pH, % Controle -->
+    </div>
+  </main>
+
+  <script>
+    const DOSADOR_ID = 1;
+    const POLL_MS    = 3000;
+
+    let spH = null; // guarda setpoint para calcular diff
+
+    const VAR_ICONS = {
+      pressao:      '🔵',
+      temperatura:  '🌡️',
+      vazao:        '💧',
+      ph:           '🧪',
+      setpoint_ph:  '🎯',
+      pct_controle: '⚙️'
+    };
+
+    async function buscar() {
+      try {
+        const r = await fetch(`/api/variaveis/${DOSADOR_ID}`);
+        if (!r.ok) throw new Error();
+        const dados = await r.json();
+        setConn(true);
+        renderizar(dados);
+      } catch {
+        setConn(false);
+      }
+    }
+
+    function setConn(ok) {
+      document.getElementById('connPulse').className = 'pulse ' + (ok ? 'on' : 'off');
+      document.getElementById('connLabel').textContent = ok ? 'Online' : 'Sem dados';
+      if (ok) {
+        const now = new Date();
+        document.getElementById('lastUpdate').textContent =
+          now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      }
+    }
+
+    function renderizar(vars) {
+      if (!vars.length) {
+        const empty = `<div class="empty-state">
+          <div class="icon">📡</div>
+          <h3>Aguardando leituras</h3>
+          <p>O agente local ainda não enviou dados.</p>
+        </div>`;
+        document.getElementById('gridPrincipal').innerHTML = empty;
+        document.getElementById('gridBottom').innerHTML = '';
+        return;
+      }
+
+      const mapa = {};
+      vars.forEach(v => mapa[v.nome_variavel] = v);
+
+      // guarda setpoint para cálculo de diff do pH
+      if (mapa['setpoint_ph']) spH = parseFloat(mapa['setpoint_ph'].valor);
+
+      // Atualiza status bomba
+      if (mapa['status_bomba']) {
+        const liga = mapa['status_bomba'].valor === 1;
+        const badge = document.getElementById('ligaBadge');
+        badge.textContent  = liga ? 'LIGA' : 'DESLIGA';
+        badge.className    = 'liga-badge ' + (liga ? 'on' : 'off');
+      }
+
+      // Grid principal: Pressão · Temperatura · Vazão
+      const principal = ['pressao', 'temperatura', 'vazao'];
+      document.getElementById('gridPrincipal').innerHTML =
+        principal.map(n => mapa[n] ? cardNumerico(mapa[n]) : '').join('');
+
+      // Grid inferior: pH · Setpoint pH · % Controle
+      const bottom = ['ph', 'setpoint_ph', 'pct_controle'];
+      document.getElementById('gridBottom').innerHTML =
+        bottom.map(n => {
+          if (!mapa[n]) return '';
+          if (n === 'pct_controle') return cardProgresso(mapa[n]);
+          if (n === 'setpoint_ph') return cardSetpoint(mapa[n]);
+          if (n === 'ph')          return cardPH(mapa[n]);
+          return cardNumerico(mapa[n]);
+        }).join('');
+    }
+
+    function cardNumerico(v) {
+      const icon  = VAR_ICONS[v.nome_variavel] || '📊';
+      const label = formatLabel(v.nome_variavel);
+      const num   = formatNum(v.valor);
+      const unit  = v.unidade || '';
+      return `
+        <div class="card">
+          <div class="card-accent"></div>
+          <span class="card-icon">${icon}</span>
+          <div class="card-label">${label}</div>
+          <div class="card-value">${num}<span class="card-unit">${unit}</span></div>
+          <div class="card-footer">
+            <span class="card-range">Última leitura</span>
+          </div>
+        </div>`;
+    }
+
+    function cardPH(v) {
+      const num = formatNum(v.valor);
+      let diffHtml = '';
+      if (spH !== null) {
+        const diff = parseFloat(v.valor) - spH;
+        const cls  = Math.abs(diff) < 0.1 ? 'ok' : diff > 0 ? 'acima' : 'abaixo';
+        const sinal = diff > 0 ? '+' : '';
+        diffHtml = `<span class="ph-diff ${cls}">${sinal}${diff.toFixed(2)} do SP</span>`;
+      }
+      return `
+        <div class="card">
+          <div class="card-accent"></div>
+          <span class="card-icon">🧪</span>
+          <div class="card-label">pH Medido</div>
+          <div class="card-value">${num}<span class="card-unit">pH</span></div>
+          <div class="ph-compare">${diffHtml}</div>
+        </div>`;
+    }
+
+    function cardSetpoint(v) {
+      return `
+        <div class="card setpoint">
+          <div class="card-accent"></div>
+          <span class="card-icon">🎯</span>
+          <div class="card-label">Setpoint pH</div>
+          <div class="card-value">${formatNum(v.valor)}<span class="card-unit">pH</span></div>
+          <div class="card-footer">
+            <span class="card-range">Valor de referência</span>
+          </div>
+        </div>`;
+    }
+
+    function cardProgresso(v) {
+      const pct = Math.min(100, Math.max(0, parseFloat(v.valor)));
+      const cor  = pct > 85 ? '#ef4444' : pct > 60 ? '#f59e0b' : 'var(--teal-light)';
+      return `
+        <div class="card">
+          <div class="card-accent"></div>
+          <span class="card-icon">⚙️</span>
+          <div class="card-label">% Controle</div>
+          <div class="card-value">${formatNum(pct)}<span class="card-unit">%</span></div>
+          <div class="progress-wrap">
+            <div class="progress-track">
+              <div class="progress-fill" style="width:${pct}%;background:linear-gradient(90deg,var(--teal),${cor})"></div>
+            </div>
+            <div class="progress-pct">${pct.toFixed(1)}%</div>
+          </div>
+        </div>`;
+    }
+
+    function formatNum(v) {
+      const n = parseFloat(v);
+      return isNaN(n) ? '—' : (n % 1 === 0 ? n.toFixed(1) : n.toFixed(2));
+    }
+
+    function formatLabel(n) {
+      const map = {
+        pressao:      'Pressão',
+        temperatura:  'Temperatura',
+        vazao:        'Vazão',
+        ph:           'pH Medido',
+        setpoint_ph:  'Setpoint pH',
+        pct_controle: '% Controle',
+        status_bomba: 'Bomba'
+      };
+      return map[n] || n.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
+    }
+
+    buscar();
+    setInterval(buscar, POLL_MS);
+  </script>
+</body>
+</html>

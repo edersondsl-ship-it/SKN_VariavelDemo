@@ -11,15 +11,14 @@ module.exports = {
   agentToken: process.env.AGENT_TOKEN || 'token-secreto-do-agente',
   intervaloMs: parseInt(process.env.INTERVALO_MS) || 5000,
 
-  // Mapeamento das variáveis do CLP
-  // Ajuste os endereços DB/offset conforme seu projeto TIA Portal
+  // Mapeamento das variáveis do CLP (ajuste DB/offset conforme TIA Portal)
   variaveis: [
-    { nome: 'vazao',       unidade: 'L/h',  db: 1, offset:  0, tipo: 'REAL' },
-    { nome: 'pressao',     unidade: 'bar',  db: 1, offset:  4, tipo: 'REAL' },
-    { nome: 'temperatura', unidade: '°C',   db: 1, offset:  8, tipo: 'REAL' },
-    { nome: 'nivel',       unidade: '%',    db: 1, offset: 12, tipo: 'REAL' },
-    { nome: 'total_dose',  unidade: 'L',    db: 1, offset: 16, tipo: 'REAL' },
-    { nome: 'motor',       unidade: '',     db: 1, offset: 20, tipo: 'BOOL', bit: 0 },
-    { nome: 'alarme',      unidade: '',     db: 1, offset: 20, tipo: 'BOOL', bit: 1 }
+    { nome: 'pressao',      unidade: 'bar', db: 1, offset:  0, tipo: 'REAL' },
+    { nome: 'temperatura',  unidade: '°C',  db: 1, offset:  4, tipo: 'REAL' },
+    { nome: 'vazao',        unidade: 'l/min', db: 1, offset: 8, tipo: 'REAL' },
+    { nome: 'ph',           unidade: 'pH',  db: 1, offset: 12, tipo: 'REAL' },
+    { nome: 'setpoint_ph',  unidade: 'pH',  db: 1, offset: 16, tipo: 'REAL' },
+    { nome: 'pct_controle', unidade: '%',   db: 1, offset: 20, tipo: 'REAL' },
+    { nome: 'status_bomba', unidade: '',    db: 1, offset: 24, tipo: 'BOOL', bit: 0 }
   ]
 };

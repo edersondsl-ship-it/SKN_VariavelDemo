@@ -41,10 +41,9 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/variaveis', require('./routes/variaveis'));
 app.use('/api/dosadores', require('./routes/dosadores'));
 
-// Rota catch-all: serve index.html para rotas não encontradas no frontend
 app.get('*', (req, res) => {
   if (!req.path.startsWith('/api/')) {
-    return res.sendFile(path.join(__dirname, '../public/login.html'));
+    return res.sendFile(path.join(__dirname, '../public/index.html'));
   }
   res.status(404).json({ error: 'Rota não encontrada' });
 });

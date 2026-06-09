@@ -2,7 +2,7 @@ require('dotenv').config();
 
 module.exports = {
   plc: {
-    ip:   process.env.PLC_IP   || '192.168.1.10',
+    ip:   process.env.PLC_IP   || '10.21.0.1',
     rack: parseInt(process.env.PLC_RACK) || 0,
     slot: parseInt(process.env.PLC_SLOT) || 1,
   },
@@ -11,15 +11,15 @@ module.exports = {
   agentToken:  process.env.AGENT_TOKEN || 'token-secreto-do-agente',
   intervaloMs: parseInt(process.env.INTERVALO_MS) || 10000,
 
-  // Endereços nodes7: 'DB<num>,<tipo><byteOffset>'
-  // Ajuste os DBs e offsets conforme seu projeto no TIA Portal
-  // IMPORTANTE: no TIA Portal, vá em Propriedades do DB → desmarque "Optimized block access"
+  // DB_Web — DB51 — CPU 10.21.0.1
+  // IMPORTANTE: Propriedades do DB → desmarcar "Optimized block access"
+  //             Propriedades CPU → Proteção → habilitar PUT/GET
   variaveis: [
-    { nome: 'pressao',      tag: 'DB1,REAL0',  unidade: 'bar'   },
-    { nome: 'temperatura',  tag: 'DB1,REAL4',  unidade: '°C'    },
-    { nome: 'vazao',        tag: 'DB1,REAL8',  unidade: 'l/min' },
-    { nome: 'ph',           tag: 'DB1,REAL12', unidade: 'pH'    },
-    { nome: 'setpoint_ph',  tag: 'DB1,REAL16', unidade: 'pH'    },
-    { nome: 'pct_controle', tag: 'DB1,REAL20', unidade: '%'     },
+    { nome: 'pressao',      tag: 'DB51,REAL0',  unidade: 'bar'   },  // PT
+    { nome: 'temperatura',  tag: 'DB51,REAL4',  unidade: '°C'    },  // TT
+    { nome: 'vazao',        tag: 'DB51,REAL8',  unidade: 'l/min' },  // VZ
+    { nome: 'ph',           tag: 'DB51,REAL12', unidade: 'pH'    },  // Ph
+    { nome: 'setpoint_ph',  tag: 'DB51,REAL16', unidade: 'pH'    },  // SP_PH
+    { nome: 'pct_controle', tag: 'DB51,REAL20', unidade: '%'     },  // pct_ctrl
   ],
 };

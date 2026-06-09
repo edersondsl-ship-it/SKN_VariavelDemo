@@ -77,6 +77,13 @@
     @keyframes ringCW  { to { transform:rotate( 360deg); } }
     @keyframes ringCCW { to { transform:rotate(-360deg); } }
 
+    /* ── KEN BURNS ── */
+    @keyframes kb1 { from{transform:scale(1.00) translate(0%,0%)}   to{transform:scale(1.14) translate(-2.5%,-1.5%)} }
+    @keyframes kb2 { from{transform:scale(1.12) translate(1.5%,.5%)} to{transform:scale(1.00) translate(-1%,1%)} }
+    @keyframes kb3 { from{transform:scale(1.05) translate(-2%,1%)}  to{transform:scale(1.13) translate(2%,-1.5%)} }
+    @keyframes kb4 { from{transform:scale(1.08) translate(0%,2%)}   to{transform:scale(1.02) translate(-2%,-.5%)} }
+    @keyframes kb5 { from{transform:scale(1.00) translate(2%,-1%)}  to{transform:scale(1.12) translate(-1%,1.5%)} }
+
     /* ── PARTICLES ── */
     .particle {
       position:fixed; pointer-events:none; z-index:5;
@@ -219,45 +226,6 @@
       margin-left:5px;
     }
 
-    .card-footer {
-      display:flex; align-items:center; justify-content:space-between;
-      margin-top:8px; padding-top:8px;
-      border-top:1px solid rgba(255,255,255,.05);
-    }
-
-    .trend {
-      font-size:.6rem; font-weight:700; letter-spacing:.05em;
-      padding:2px 7px; border-radius:5px;
-    }
-    .trend.up   { background:rgba(239,68,68,.15); color:#fca5a5; }
-    .trend.down { background:rgba(96,165,250,.12); color:#93c5fd; }
-    .trend.ok   { background:rgba(45,212,191,.12); color:#5eead4; }
-
-    /* pH diff */
-    .ph-diff {
-      display:flex; align-items:center; gap:6px;
-      margin-top:6px;
-    }
-    .ph-diff-val {
-      font-size:.65rem; font-weight:700; padding:2px 8px;
-      border-radius:5px; font-variant-numeric:tabular-nums;
-    }
-    .ph-diff-val.acima  { background:rgba(239,68,68,.15); color:#fca5a5; }
-    .ph-diff-val.abaixo { background:rgba(245,158,11,.15); color:#fde68a; }
-    .ph-diff-val.ok     { background:rgba(45,212,191,.12); color:#5eead4; }
-
-    /* % Controle — barra */
-    .prog-track {
-      height:4px; border-radius:4px;
-      background:rgba(255,255,255,.07);
-      margin-top:8px; overflow:hidden;
-    }
-    .prog-fill {
-      height:100%; border-radius:4px;
-      background:linear-gradient(90deg, #0d9488, #2dd4bf);
-      transition:width .7s cubic-bezier(.4,0,.2,1);
-    }
-
     /* card setpoint — destaque diferente */
     .card.setpoint {
       border-color:rgba(96,165,250,.2);
@@ -359,54 +327,36 @@
   <!-- Cards de variáveis -->
   <div id="cards-wrap">
     <div class="vars-row">
-      <div class="card" id="card-pressao">
+      <div class="card">
         <div class="card-label">Pressão</div>
-        <div><span class="card-value" id="val-pressao">11.9</span><span class="card-unit">bar</span></div>
-        <div class="card-footer">
-          <span class="trend ok" id="trend-pressao">ESTÁVEL</span>
-        </div>
+        <div><span class="card-value" id="val-pressao">--</span><span class="card-unit">bar</span></div>
       </div>
 
-      <div class="card" id="card-temperatura">
+      <div class="card">
         <div class="card-label">Temperatura</div>
-        <div><span class="card-value" id="val-temperatura">22.2</span><span class="card-unit">°C</span></div>
-        <div class="card-footer">
-          <span class="trend ok" id="trend-temperatura">ESTÁVEL</span>
-        </div>
+        <div><span class="card-value" id="val-temperatura">--</span><span class="card-unit">°C</span></div>
       </div>
 
-      <div class="card" id="card-vazao">
+      <div class="card">
         <div class="card-label">Vazão</div>
-        <div><span class="card-value" id="val-vazao">2.4</span><span class="card-unit">l/min</span></div>
-        <div class="card-footer">
-          <span class="trend ok" id="trend-vazao">ESTÁVEL</span>
-        </div>
+        <div><span class="card-value" id="val-vazao">--</span><span class="card-unit">l/min</span></div>
       </div>
     </div>
 
     <div class="vars-row">
-      <div class="card" id="card-ph">
+      <div class="card">
         <div class="card-label">pH Medido</div>
-        <div><span class="card-value" id="val-ph">3.14</span><span class="card-unit">pH</span></div>
-        <div class="ph-diff">
-          <span class="ph-diff-val abaixo" id="ph-diff-val">-0.86 do SP</span>
-        </div>
+        <div><span class="card-value" id="val-ph">--</span><span class="card-unit">pH</span></div>
       </div>
 
-      <div class="card setpoint" id="card-setpoint">
+      <div class="card setpoint">
         <div class="card-label">Setpoint pH</div>
-        <div><span class="card-value" id="val-setpoint">4.00</span><span class="card-unit">pH</span></div>
-        <div class="card-footer">
-          <span class="trend ok">REFERÊNCIA</span>
-        </div>
+        <div><span class="card-value" id="val-setpoint">--</span><span class="card-unit">pH</span></div>
       </div>
 
-      <div class="card" id="card-ctrl">
+      <div class="card">
         <div class="card-label">% Controle</div>
-        <div><span class="card-value" id="val-ctrl">53.3</span><span class="card-unit">%</span></div>
-        <div class="prog-track">
-          <div class="prog-fill" id="prog-fill" style="width:53.3%"></div>
-        </div>
+        <div><span class="card-value" id="val-ctrl">--</span><span class="card-unit">%</span></div>
       </div>
     </div>
   </div>
@@ -427,80 +377,99 @@
     const elClock = document.getElementById('hud-clock');
     const elDay   = document.getElementById('hud-date-d');
     const elMonth = document.getElementById('hud-date-m');
-
     function tick() {
       const n = new Date(), p = v => String(v).padStart(2,'0');
       elClock.textContent = `${p(n.getHours())}:${p(n.getMinutes())}`;
       elDay.textContent   = p(n.getDate());
       elMonth.textContent = `${DAYS[n.getDay()]}  ${MONTHS[n.getMonth()]}  ${n.getFullYear()}`;
     }
-    tick();
-    setInterval(tick, 1000);
+    tick(); setInterval(tick, 1000);
+
+    /* ── FOTOS BACKGROUND ── */
+    const KBS            = ['kb1','kb2','kb3','kb4','kb5'];
+    const PHOTO_INTERVAL = 8000;
+    const STAGE_LEAD_MS  = 3500;
+    let photoCurrent = 0, useA = true, stagedIdx = 1;
+    const bgA = document.getElementById('bgA');
+    const bgB = document.getElementById('bgB');
+    const validPhotos = [];
+
+    function preload(photos, done) {
+      if (!photos.length) { done(); return; }
+      let n = photos.length;
+      photos.forEach(p => {
+        const img = new Image();
+        img.onload  = () => { validPhotos.push(p); if (--n === 0) done(); };
+        img.onerror = () => { if (--n === 0) done(); };
+        img.src = p.src;
+      });
+    }
+    function applyKB(el, anim) {
+      el.style.animation = 'none'; el.offsetHeight;
+      el.style.animation = `${anim} 14s ease-out forwards`;
+    }
+    function showFirst() {
+      const p = validPhotos[0];
+      bgA.style.backgroundImage = `url('${p.src}')`;
+      bgA.style.opacity = '1'; bgB.style.opacity = '0';
+      applyKB(bgA, p.kb);
+    }
+    function stageNext() {
+      if (validPhotos.length < 2) return;
+      stagedIdx = (photoCurrent + 1) % validPhotos.length;
+      const inc = useA ? bgB : bgA;
+      inc.style.backgroundImage = `url('${validPhotos[stagedIdx].src}')`;
+      inc.style.opacity = '0'; inc.style.animation = 'none';
+    }
+    function crossfade() {
+      if (validPhotos.length < 2) return;
+      const p   = validPhotos[stagedIdx];
+      const inc = useA ? bgB : bgA;
+      const out = useA ? bgA : bgB;
+      applyKB(inc, p.kb);
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        inc.style.opacity = '1'; out.style.opacity = '0';
+      }));
+      useA = !useA; photoCurrent = stagedIdx;
+      setTimeout(stageNext, PHOTO_INTERVAL - STAGE_LEAD_MS);
+      setTimeout(crossfade, PHOTO_INTERVAL);
+    }
+
+    fetch('/api/foto-marketing')
+      .then(r => r.json())
+      .then(files => {
+        const photos = files.map((f, i) => ({
+          src: `/Foto_marketing/${encodeURIComponent(f)}`,
+          kb: KBS[i % KBS.length],
+        }));
+        preload(photos, () => {
+          if (!validPhotos.length) return;
+          showFirst();
+          if (validPhotos.length > 1) { stageNext(); setTimeout(crossfade, PHOTO_INTERVAL); }
+        });
+      })
+      .catch(() => {});
 
     /* ── DADOS REAIS ── */
     const DOSADOR_ID = 1;
-    const POLL_MS    = 10000;
-
-    // guarda leitura anterior para calcular tendência
-    const anterior = {};
-
-    function trendClass(nome, val) {
-      if (anterior[nome] === undefined) return ['ok', 'ESTÁVEL'];
-      const d = val - anterior[nome];
-      const thr = { pressao: 0.15, temperatura: 0.1, vazao: 0.2 };
-      const t = thr[nome] ?? 0.05;
-      if (Math.abs(d) < t) return ['ok', 'ESTÁVEL'];
-      return d > 0 ? ['up', '▲ SUBINDO'] : ['down', '▼ DESCENDO'];
-    }
 
     function renderDados(lista) {
       const m = {};
       lista.forEach(v => { m[v.nome_variavel] = parseFloat(v.valor); });
-
-      const fmt1 = v => isNaN(v) ? '—' : v.toFixed(1);
-      const fmt2 = v => isNaN(v) ? '—' : v.toFixed(2);
-
-      // Valores numéricos
-      document.getElementById('val-pressao').textContent    = fmt1(m.pressao);
-      document.getElementById('val-temperatura').textContent = fmt1(m.temperatura);
-      document.getElementById('val-vazao').textContent      = fmt1(m.vazao);
-      document.getElementById('val-ph').textContent         = fmt2(m.ph);
-      document.getElementById('val-ctrl').textContent       = fmt1(m.pct_controle);
-
-      // Trends
-      ['pressao', 'temperatura', 'vazao'].forEach(nome => {
-        const val = m[nome];
-        if (isNaN(val)) return;
-        const [cls, label] = trendClass(nome, val);
-        const el = document.getElementById(`trend-${nome}`);
-        el.textContent = label;
-        el.className   = `trend ${cls}`;
-        anterior[nome] = val;
-      });
-
-      // pH diff vs Setpoint
-      const sp   = m.setpoint_ph ?? NaN;
-      const ph   = m.ph ?? NaN;
-      const elDiff = document.getElementById('ph-diff-val');
-      if (!isNaN(sp) && !isNaN(ph)) {
-        const diff = parseFloat((ph - sp).toFixed(2));
-        const sign = diff >= 0 ? '+' : '';
-        const cls  = Math.abs(diff) < 0.1 ? 'ok' : diff > 0 ? 'acima' : 'abaixo';
-        elDiff.textContent = `${sign}${diff} do SP`;
-        elDiff.className   = `ph-diff-val ${cls}`;
-      }
-
-      // Barra % Controle
-      const pct = isNaN(m.pct_controle) ? 0 : Math.min(100, Math.max(0, m.pct_controle));
-      const fillColor = pct > 85 ? '#ef4444' : pct > 65 ? '#f59e0b' : '#2dd4bf';
-      document.getElementById('prog-fill').style.width      = pct + '%';
-      document.getElementById('prog-fill').style.background = `linear-gradient(90deg,#0d9488,${fillColor})`;
+      const fmt1 = v => isNaN(v) ? '--' : v.toFixed(1);
+      const fmt2 = v => isNaN(v) ? '--' : v.toFixed(2);
+      document.getElementById('val-pressao').textContent     = fmt1(m.pressao);
+      document.getElementById('val-temperatura').textContent  = fmt1(m.temperatura);
+      document.getElementById('val-vazao').textContent       = fmt1(m.vazao);
+      document.getElementById('val-ph').textContent          = fmt2(m.ph);
+      document.getElementById('val-setpoint').textContent    = fmt2(m.setpoint_ph);
+      document.getElementById('val-ctrl').textContent        = fmt1(m.pct_controle);
     }
 
     function setStatus(online) {
       const el = document.getElementById('conn-status');
-      el.textContent  = online ? '● ONLINE' : '● SEM SINAL';
-      el.style.color  = online ? 'rgba(45,212,191,.75)' : 'rgba(239,68,68,.7)';
+      el.textContent = online ? '● ONLINE' : '● SEM SINAL';
+      el.style.color = online ? 'rgba(45,212,191,.75)' : 'rgba(239,68,68,.7)';
     }
 
     async function buscar() {
@@ -510,31 +479,22 @@
         const dados = await r.json();
         setStatus(dados.length > 0);
         if (dados.length) renderDados(dados);
-      } catch {
-        setStatus(false);
-      }
+      } catch { setStatus(false); }
     }
-
-    buscar();
-    setInterval(buscar, POLL_MS);
+    buscar(); setInterval(buscar, 10000);
 
     /* ── PARTICLES ── */
     const PTYPES  = ['dot','dot','line','line','hex','hex','dot'];
     const HEX_STR = ['FF','2A','C3','0E','7F','B1','A9'];
     for (let i = 0; i < 7; i++) {
-      const el   = document.createElement('div');
-      const type = PTYPES[i];
+      const el = document.createElement('div'), type = PTYPES[i];
       el.className = `particle ${type}`;
       if (type === 'hex') el.textContent = HEX_STR[i];
-      const x   = (4  + Math.random() * 92).toFixed(1);
-      const y   = (10 + Math.random() * 80).toFixed(1);
-      const dur = (6  + Math.random() * 9).toFixed(1);
-      const del = (Math.random() * 12).toFixed(2);
-      const dx  = ((Math.random() - .5) * 24).toFixed(1);
-      const op  = (type === 'hex' ? .4 + Math.random() * .25 : .25 + Math.random() * .4).toFixed(2);
-      const sz  = type === 'line'
-        ? (10 + Math.random() * 18).toFixed(0) + 'px'
-        : (2  + Math.random() * 2).toFixed(0)  + 'px';
+      const x = (4 + Math.random()*92).toFixed(1), y = (10+Math.random()*80).toFixed(1);
+      const dur = (6+Math.random()*9).toFixed(1), del = (Math.random()*12).toFixed(2);
+      const dx = ((Math.random()-.5)*24).toFixed(1);
+      const op = (type==='hex'?.4+Math.random()*.25:.25+Math.random()*.4).toFixed(2);
+      const sz = type==='line'?(10+Math.random()*18).toFixed(0)+'px':(2+Math.random()*2).toFixed(0)+'px';
       el.style.cssText = `left:${x}%;top:${y}%;--sz:${sz};--pd:${dur}s;--del:${del}s;--dx:${dx}px;--op:${op};`;
       document.body.appendChild(el);
     }

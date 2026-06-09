@@ -3,6 +3,7 @@ const session = require('express-session');
 const MySQLStore = require('express-mysql-session')(session);
 const cors = require('cors');
 const path = require('path');
+const fs   = require('fs');
 require('dotenv').config();
 
 const app = express();
@@ -40,6 +41,14 @@ app.use(express.static(path.join(__dirname, '../public')));
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/variaveis', require('./routes/variaveis'));
 app.use('/api/dosadores', require('./routes/dosadores'));
+
+app.get('/api/foto-marketing', (req, res) => {
+  const dir = path.join(__dirname, '../public/Foto_marketing');
+  try {
+    const files = fs.readdirSync(dir).filter(f => /\.(jpe?g|jpg|png)$/i.test(f));
+    res.json(files);
+  } catch { res.json([]); }
+});
 
 app.get('*', (req, res) => {
   if (!req.path.startsWith('/api/')) {

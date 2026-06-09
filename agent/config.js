@@ -7,7 +7,7 @@ module.exports = {
     slot: parseInt(process.env.PLC_SLOT) || 1,
   },
   dosadorId:   parseInt(process.env.DOSADOR_ID) || 1,
-  serverUrl:   process.env.SERVER_URL  || 'http://localhost:3001',
+  serverUrl:   process.env.SERVER_URL  || 'https://sinkrondosador01.up.railway.app',
   agentToken:  process.env.AGENT_TOKEN || 'token-secreto-do-agente',
   intervaloMs: parseInt(process.env.INTERVALO_MS) || 10000,
 
